@@ -65,7 +65,7 @@ export function run({ ENGINE_API_KEY, PORT: portFromEnv = 3100,} = {}) {
   // const sessionStore = setUpGitHubLogin(app);
   // app.use(cookieParser(config.sessionStoreSecret));
 
-  app.use('/graphql/**', graphqlExpress((req) => {
+  app.use('/graphql', graphqlExpress((req) => {
 
     // Get the query, the same way express-graphql does it
     // https://github.com/graphql/express-graphql/blob/3fa6e68582d6d933d37fa9e841da5d2aa39261cd/src/index.js#L257
