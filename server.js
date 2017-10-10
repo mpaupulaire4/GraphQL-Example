@@ -76,8 +76,6 @@ export function run({ ENGINE_API_KEY, PORT: portFromEnv = 3100,} = {}) {
     //   throw new Error('Query too large.');
     // }
 
-    console.log(req.query)
-
     let user;
     if (req.user) {
       // We get req.user from passport-github with some pretty oddly named fields,

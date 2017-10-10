@@ -36,7 +36,6 @@ const rootResolvers = {
     },
     add: () => {
       messages.push('text')
-      // pubsub.publish(MESSAGE_ADDED_TOPIC, {messageAdded: text} );
       pubsub.publish(MESSAGE_ADDED_TOPIC, {messageAdded: 'text'} );
       return messages
     }
@@ -44,7 +43,6 @@ const rootResolvers = {
   Mutation: {
     addMessage: (_, { text }, context) => {
       messages.push(text)
-      // pubsub.publish(MESSAGE_ADDED_TOPIC, {messageAdded: text} );
       pubsub.publish(MESSAGE_ADDED_TOPIC, {messageAdded: text} );
       return messages
     }
