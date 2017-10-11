@@ -9,13 +9,16 @@ const messages = [];
 const pubsub = new PubSub();
 
 const rootSchema = [`
+
 type Query {
     hello: String
     add: [String]
 }
+
 type Subscription {
   messageAdded(ID: Int): String
 }
+
 type Mutation {
   addMessage(text: String!): [String]
 }
@@ -25,6 +28,7 @@ schema {
   subscription: Subscription
   mutation: Mutation
 }
+
 `];
 
 const MESSAGE_ADDED_TOPIC = 'message-added';
