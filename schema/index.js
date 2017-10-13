@@ -1,48 +1,48 @@
 import { merge } from 'lodash';
-import { makeExecutableSchema } from 'graphql-tools';
-import { PubSub } from 'graphql-subscriptions';
+import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools';
 
-// import { schema as gitHubSchema, resolvers as gitHubResolvers } from './github/schema';
-// import { schema as sqlSchema, resolvers as sqlResolvers } from './sql/schema';
-// import { pubsub } from './subscriptions';
+// TYPE DEFS
+import { EventSchema, EventResolvers } from './Event'
+import { UserSchema, UserResolvers } from './User'
+import { ConversationSchema, ConversationResolvers } from './Conversation'
+
+// END TYPE DEFS
+
+// TEMPORARY
+import { PubSub } from 'graphql-subscriptions';
 const messages = [];
 const pubsub = new PubSub();
+// END TEMPORARY
 
-const rootSchema = [`
+const RootSchema = `
 
 type Query {
     hello: String
-    add: [String]
 }
 
 type Subscription {
-  messageAdded(ID: Int): String
+    messageAdded(ID: Int): String
 }
 
 type Mutation {
-  addMessage(text: String!): [String]
+    addMessage(text: String!): [String]
 }
 
 schema {
-  query: Query
-  subscription: Subscription
-  mutation: Mutation
+    query: Query
+    subscription: Subscription
+    mutation: Mutation
 }
 
-`];
+`;
 
 const MESSAGE_ADDED_TOPIC = 'message-added';
 
-const rootResolvers = {
+const RootResolvers = {
   Query: {
     hello: () => {
         return Math.random() < 0.5 ? 'Take it easy' : 'Salvation lies within';
     },
-    add: () => {
-      messages.push('text')
-      pubsub.publish(MESSAGE_ADDED_TOPIC, {messageAdded: 'text'} );
-      return messages
-    }
   },
   Mutation: {
     addMessage: (_, { text }, context) => {
@@ -61,19 +61,25 @@ const rootResolvers = {
 // Put schema together into one array of schema strings
 // and one map of resolvers, like makeExecutableSchema expects
 const schema = [
-    ...rootSchema,
-    // ...gitHubSchema,
-    // ...sqlSchema
+    RootSchema,
+    EventSchema,
+    UserSchema,
+    ConversationSchema
 ];
+
 const resolvers = merge(
-    rootResolvers,
-    // gitHubResolvers,
-    // sqlResolvers,
+    RootResolvers,
+    EventResolvers,
+    UserResolvers,
+    ConversationResolvers
 );
 
 const executableSchema = makeExecutableSchema({
   typeDefs: schema,
   resolvers,
 });
+
+// FOR TESTING
+addMockFunctionsToSchema({schema: executableSchema})
 
 export default executableSchema;
