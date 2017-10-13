@@ -1,7 +1,7 @@
 import path from 'path';
 import express from 'express';
-// import cookie from 'cookie';
-// import cookieParser from 'cookie-parser';
+import cookie from 'cookie';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { Engine } from 'apollo-engine';
@@ -23,7 +23,7 @@ import schema from './schema';
 // const WS_GQL_PATH = '/subscriptions';
 
 // Arguments usually come from env vars
-export function run({ ENGINE_API_KEY, PORT: portFromEnv = 3100,} = {}) {
+export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 3100,} = {}) {
 
   let port = portFromEnv;
   if (isString(portFromEnv)) {
@@ -58,7 +58,7 @@ export function run({ ENGINE_API_KEY, PORT: portFromEnv = 3100,} = {}) {
   app.use(bodyParser.json());
 
   // const sessionStore = setUpGitHubLogin(app);
-  // app.use(cookieParser(config.sessionStoreSecret));
+  app.use(cookieParser(SESSION_STORE_SECRET));
 
   app.use('/graphql', graphqlExpress((req) => {
 
