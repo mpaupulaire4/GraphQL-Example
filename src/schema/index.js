@@ -18,6 +18,9 @@ const RootSchema = `
 
 type Query {
     hello: String
+
+    # Get the currently logged in user (null if none)
+    currentUser: User
 }
 
 type Subscription {
@@ -40,9 +43,8 @@ const MESSAGE_ADDED_TOPIC = 'message-added';
 
 const RootResolvers = {
   Query: {
-    hello: () => {
-        return Math.random() < 0.5 ? 'Take it easy' : 'Salvation lies within';
-    },
+    hello: () => Math.random() < 0.5 ? 'Take it easy' : 'Salvation lies within',
+    currentUser: (_, args, {user}) => user
   },
   Mutation: {
     addMessage: (_, { text }, context) => {
@@ -79,7 +81,7 @@ const executableSchema = makeExecutableSchema({
   resolvers,
 });
 
-// FOR TESTING
+// FOR TESTING SCHEMA
 addMockFunctionsToSchema({schema: executableSchema})
 
 export default executableSchema;

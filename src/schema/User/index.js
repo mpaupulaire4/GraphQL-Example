@@ -14,7 +14,10 @@ const User =`
         last_name: String
 
         # User's full name
-        full_name: String
+        name: String
+
+        # User's email
+        email: String
 
         # User's name for use in being displayed. May be different based on relationship to the User
         display_name: String!
@@ -51,10 +54,11 @@ export const UserResolvers = {
         },
         user: (_, args, context) => {
             return null
-        }
+        },
     },
     User: {
-        full_name: (user) => user.full_name || `${user.first_name} ${user.last_name}`,
+        name: (user) => user.name || `${user.first_name} ${user.last_name}`,
+        display_name: (user) => `${user.first_name}`,
         events: (user) => {
             return []
         }

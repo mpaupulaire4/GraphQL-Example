@@ -12,7 +12,7 @@ import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
 
-// import { setUpGitHubLogin } from './githubLogin';
+import { initAuth } from './Auth'
 // import { GitHubConnector } from './github/connector';
 // import { Repositories, Users } from './github/models';
 // import { Entries, Comments } from './sql/models';
@@ -57,7 +57,7 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
-  // const sessionStore = setUpGitHubLogin(app);
+  const sessionStore = initAuth(app);
   app.use(cookieParser(SESSION_STORE_SECRET));
 
   app.use('/graphql', graphqlExpress((req) => {
@@ -71,16 +71,8 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
     //   throw new Error('Query too large.');
     // }
 
-    let user;
-    if (req.user) {
-      // We get req.user from passport-github with some pretty oddly named fields,
-      // let's convert that to the fields in our schema, which match the GitHub
-      // API field names.
-      user = {
-        login: req.user.username,
-        html_url: req.user.profileUrl,
-        avatar_url: req.user.photos[0].value,
-      };
+    if (!req.user) {
+      req.logout()
     }
 
     // Initialize a new GitHub connector instance for every GraphQL request, so that API fetches
@@ -94,7 +86,8 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
       schema,
       tracing: true,
       context: {
-        user,
+      // User should be set to null or properly deserialized
+      user: req.user,
         // Repositories: new Repositories({ connector: gitHubConnector }),
         // Users: new Users({ connector: gitHubConnector }),
         // Entries: new Entries(),
