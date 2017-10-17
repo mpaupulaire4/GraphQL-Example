@@ -1,4 +1,4 @@
-import { setUpSessionStore } from '../MongoDB'
+import { setUpSessionStore } from '../Firebase/store'
 import { setUpAuth } from './Facebook'
 
 export function initAuth(app) {
