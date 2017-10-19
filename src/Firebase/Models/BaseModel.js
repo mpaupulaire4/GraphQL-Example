@@ -9,11 +9,11 @@ export class BaseModel {
     }
 
     _findByIds = async (ids = []) => {
-        return Promise.all(ids.map((id) => this._findById(id, false)))
+        return Promise.all(ids.map((id) => this._findById(id)))
     }
 
-    _findById = async (id, flat_data = false) => {
-        return this._collection.doc(id).get().then((doc) => doc.exists ? this._should_flatten_doc(doc, flat_data) : null)
+    _findById = async (id) => {
+        return this._collection.doc(id).get().then((doc) => doc.exists ? this._doc_to_instance(doc) : null)
     }
     async findByIds(ids = []) {
         return this.loaderById.loadMany(ids)
@@ -22,7 +22,7 @@ export class BaseModel {
         return this.loaderById.load(id)
     }
 
-    async find({id, ...data} = {}, flat_data = false){
+    async find({id, ...data} = {}){
         if (id){
             return this.findById(id)
         }
@@ -34,13 +34,13 @@ export class BaseModel {
 
         return query.get().then((snap) => {
             return snap.docs.map((doc) => {
-                return this._should_flatten_doc(doc, flat_data)
+                return this._doc_to_instance(doc)
             })
         })
     }
-    async findOne({id, ...data} = {}, flat_data = false){
+    async findOne({id, ...data} = {}){
         if (id){
-            return this.findById(id, flat_data)
+            return this.findById(id)
         }
 
         let query = this._collection
@@ -53,14 +53,11 @@ export class BaseModel {
             if (!doc || !doc.exists){
                 return null
             }
-            return this._should_flatten_doc(doc, flat_data)
+            return this._doc_to_instance(doc)
         })
     }
 
-    _should_flatten_doc(doc, flatten){
-        if (flatten){
-            return {...doc.data(), id: doc.id}
-        }
+    _doc_to_instance(doc){
         const instance = new this.DataInstance(doc.data())
         instance._doc = doc.ref;
         return instance

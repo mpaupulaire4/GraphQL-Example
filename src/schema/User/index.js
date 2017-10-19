@@ -32,7 +32,7 @@ const User =`
         facebook: FacebookProviderInfo!
 
         # List of the User's friends
-        friends: [User!]!
+        friends: [User!]
     }
 
     extend type Query {
