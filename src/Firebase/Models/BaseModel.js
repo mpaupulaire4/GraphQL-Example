@@ -1,0 +1,123 @@
+import { FirebaseRef } from '../'
+import DataLoader from 'dataloader'
+
+export const database = FirebaseRef.firestore()
+
+export class BaseModel {
+    constructor(){
+        this.loaderById = new DataLoader(this._findByIds)
+    }
+
+    _findByIds = async (ids = []) => {
+        return Promise.all(ids.map((id) => this._findById(id, false)))
+    }
+
+    _findById = async (id, flat_data = false) => {
+        return this._collection.doc(id).get().then((doc) => doc.exists ? this._should_flatten_doc(doc, flat_data) : null)
+    }
+    async findByIds(ids = []) {
+        return this.loaderById.loadMany(ids)
+    }
+    async findById(id){
+        return this.loaderById.load(id)
+    }
+
+    async find({id, ...data} = {}, flat_data = false){
+        if (id){
+            return this.findById(id)
+        }
+
+        let query = this._collection
+        Object.keys(data).forEach((key) => {
+            query = query.where(key,'==', data[key])
+        })
+
+        return query.get().then((snap) => {
+            return snap.docs.map((doc) => {
+                return this._should_flatten_doc(doc, flat_data)
+            })
+        })
+    }
+    async findOne({id, ...data} = {}, flat_data = false){
+        if (id){
+            return this.findById(id, flat_data)
+        }
+
+        let query = this._collection
+        Object.keys(data).forEach((key) => {
+            query = query.where(key,'==', data[key])
+        })
+
+        return query.get().then((snap) => {
+            const doc = snap.docs[0]
+            if (!doc || !doc.exists){
+                return null
+            }
+            return this._should_flatten_doc(doc, flat_data)
+        })
+    }
+
+    _should_flatten_doc(doc, flatten){
+        if (flatten){
+            return {...doc.data(), id: doc.id}
+        }
+        const instance = new this.DataInstance(doc.data())
+        instance._doc = doc.ref;
+        return instance
+    }
+
+    get _collection() {
+       return  database.collection(this._collection_path)
+    }
+
+    get _collection_path(){
+        throw new Error('No Collection Path Specified')
+    }
+
+    get DataInstance() {
+        const Parent = this;
+        class DataInstance {
+            constructor(data={}){
+                if (data instanceof DataInstance){
+                    this._data = data._data;
+                    this._doc = data._doc;
+                    return
+                }
+                this._data = data;
+                this._doc = null
+            }
+
+            get id() {
+                return this._doc && this._doc.id
+            }
+
+            _create(){
+                if (!this._doc){
+                    this._doc = Parent._collection.doc();
+                    this._doc.set({})
+                }
+            }
+
+            save() {
+                this._create()
+                return this._doc.update(this._data)
+            }
+
+            set(data) {
+                this._create()
+                this._doc.set(data)
+                this._data = data
+            }
+
+            update(data){
+                this._data = {...this._data, ...data}
+                this.save()
+            }
+
+            json(){
+                return {...this._data, id: this._doc && this._doc.id}
+            }
+        }
+        return DataInstance;
+    }
+}

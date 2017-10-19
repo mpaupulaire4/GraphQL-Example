@@ -1,5 +1,6 @@
 import passport from 'passport'
 import PassportFacebook from 'passport-facebook'
+import { User } from '../Firebase/Models'
 
 export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
     if (!FACEBOOK_APP_ID || !FACEBOOK_APP_SECRET) {
@@ -13,17 +14,26 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
         callbackURL: process.env.NODE_ENV !== 'production' ? 'http://localhost:3100/auth/facebook/callback' : 'http://PROD_URL/login/github/callback',
         profileFields: ['id', 'displayName', 'email', 'name', 'profileUrl', 'photos', 'friends']
     }, (accessToken, refreshToken, profile, done) => {
-        // console.log(JSON.stringify(profile._json, null, 2));
-        const user = FBProfileToUser(profile._json)
-        ProcessFriendsList(profile._json.friends)
-        done(null, {id: profile._json.id, ...user})
+        const profileObj = profile._json
+        const UserModel = new User();
+        UserModel.DataInstance
+        FBProfileToUser(profileObj, UserModel).then((user) => {
+            done(null, user)
+        }).catch((error) => {
+            done(null, false, error)
+        })
+
+        ProcessFriendsList(profileObj.friends, UserModel)
+        UpdateFacebookInfo(profileObj, UserModel)
     }))
 
     passport.serializeUser((user, done) => {
         done(null, user.id);
     });
     passport.deserializeUser((id, done) => {
-        done(null, {id});
+        new User().findById(id).then((user) => {
+            done(null, user.json());
+        })
     });
 
     app.use(passport.initialize());
@@ -50,17 +60,35 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
 }
 
 
-function FBProfileToUser({id, last_name, first_name, name, email, picture, link, friends, ...profile}){
-    return {
+function FBProfileToUser({id, last_name, first_name, name, email, picture, link}, UserModel){
+    const userInfo = {
         name,
         first_name,
         last_name,
         email,
         photo_url: picture.data.url,
+        facebook: {
+            id,
+            link
+        }
     }
+    return UserModel.findOne({'facebook.id': id}).then((user) => {
+        if (user){
+            return user
+        }
+
+        const newUser = new UserModel.DataInstance(userInfo);
+        newUser.save().catch(error => console.log(error));
+        return newUser.json()
+    })
 }
 
 async function ProcessFriendsList(friends) {
-    console.log('FRIEND DATA:', JSON.stringify(friends, null, 2))
+    // console.log('FRIEND DATA:', JSON.stringify(friends, null, 2))
     // Go through the list and process this user's friends list
+}
+
+async function UpdateFacebookInfo({id, link}) {
+    console.log(JSON.stringify({id, link}, null, 2))
+    // Update some information that may need updating when logged in
 }

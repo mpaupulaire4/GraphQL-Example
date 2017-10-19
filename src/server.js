@@ -13,9 +13,7 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
 
 import { initAuth } from './Auth'
-// import { GitHubConnector } from './github/connector';
-// import { Repositories, Users } from './github/models';
-// import { Entries, Comments } from './sql/models';
+import { User, Event, Convo } from './Firebase/Models'
 import schema from './schema';
 // import queryMap from '../extracted_queries.json';
 // import engineConfig from './engineConfig';
@@ -86,13 +84,11 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
       schema,
       tracing: true,
       context: {
-      // User should be set to null or properly deserialized
-      user: req.user,
-        // Repositories: new Repositories({ connector: gitHubConnector }),
-        // Users: new Users({ connector: gitHubConnector }),
-        // Entries: new Entries(),
-        // Comments: new Comments(),
-        // opticsContext,
+        // User should be set to null or properly deserialized
+        current_user: req.user,
+        User: new User(),
+        Event: new Event(),
+        Convo: new Convo()
       },
     };
   }));

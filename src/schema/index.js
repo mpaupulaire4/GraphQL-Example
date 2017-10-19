@@ -17,10 +17,8 @@ const pubsub = new PubSub();
 const RootSchema = `
 
 type Query {
-    hello: String
-
     # Get the currently logged in user (null if none)
-    currentUser: User
+    current_user: User
 }
 
 type Subscription {
@@ -43,8 +41,7 @@ const MESSAGE_ADDED_TOPIC = 'message-added';
 
 const RootResolvers = {
   Query: {
-    hello: () => Math.random() < 0.5 ? 'Take it easy' : 'Salvation lies within',
-    currentUser: (_, args, {user}) => user
+    current_user: (_, args, {current_user}) => current_user
   },
   Mutation: {
     addMessage: (_, { text }, context) => {
@@ -82,6 +79,6 @@ const executableSchema = makeExecutableSchema({
 });
 
 // FOR TESTING SCHEMA
-addMockFunctionsToSchema({schema: executableSchema})
+// addMockFunctionsToSchema({schema: executableSchema})
 
 export default executableSchema;

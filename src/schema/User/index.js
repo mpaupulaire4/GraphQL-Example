@@ -25,11 +25,11 @@ const User =`
         # URL for a User's phto
         photo_url: String
 
-        # User's email
-        email: String
-
         # List of events
         events: [Event!]
+
+        # User's Facebook Info
+        facebook: FacebookProviderInfo!
 
         # List of the User's friends
         friends: [User!]!
@@ -47,23 +47,31 @@ const User =`
     }
 `
 
+const FacebookProviderInfo = `
+    type FacebookProviderInfo {
+        # User's facebook id
+        id: ID!
+        link: String
+    }
+`
+
 export const UserResolvers = {
     Query: {
-        users: (_, args, context) => {
-            return []
+        users: (_, args, { User, ...context}) => {
+            return User.find()
         },
-        user: (_, args, context) => {
-            return null
+        user: (_, args, { User, ...context}) => {
+            return User.find({id: args.id});
         },
     },
     User: {
         name: (user) => user.name || `${user.first_name} ${user.last_name}`,
         display_name: (user) => `${user.first_name}`,
-        events: (user) => {
+        events: (user, args, context) => {
             return []
         }
     }
 }
 
 
-export const UserSchema = ()=> [ User, EventSchema]
+export const UserSchema = ()=> [ User, FacebookProviderInfo, EventSchema]
