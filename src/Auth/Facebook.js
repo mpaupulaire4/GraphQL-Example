@@ -18,7 +18,7 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
         const UserModel = new User();
         FBProfileToUser(profileObj, UserModel).then((user) => {
             done(null, user)
-            ProcessFriendsList(profileObj.friends, user, UserModel).catch((error) => {
+            UserModel.ProccessFBFriendsForUser(user.id, profileObj.friends.data).catch((error) => {
                 console.log(error)
             })
         }).catch((error) => {

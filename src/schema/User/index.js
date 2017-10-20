@@ -25,9 +25,6 @@ const User =`
         # URL for a User's phto
         photo_url: String
 
-        # List of events
-        events: [Event!]
-
         # User's Facebook Info
         facebook: FacebookProviderInfo!
 
@@ -74,9 +71,6 @@ export const UserResolvers = {
         },
     },
     User: {
-        events: (user, args, context) => {
-            return []
-        }
     }
 }
 

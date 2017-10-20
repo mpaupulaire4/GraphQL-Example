@@ -2,10 +2,6 @@ import { BaseModel } from './BaseModel'
 
 export default class User extends BaseModel {
 
-    constructor(current_user = {}) {
-        super()
-        this._current_user_id = current_user.id;
-    }
     get _collection_path() {
         return 'users'
     }

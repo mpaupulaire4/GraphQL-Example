@@ -5,7 +5,8 @@ import { merge } from 'lodash'
 export const database = FirebaseRef.firestore()
 
 export class BaseModel {
-    constructor(){
+    constructor(current_user_id){
+        this._current_user_id = current_user_id;
         this.loaderById = new DataLoader(this._findByIds)
     }
 
