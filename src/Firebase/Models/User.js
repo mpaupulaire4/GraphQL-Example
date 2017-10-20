@@ -23,7 +23,7 @@ export default class User extends BaseModel {
     }
 
     async getUserFriendsById(id){
-        this.findById(id).then((user) => {
+        return this.findById(id).then((user) => {
             return user.friends
         })
     }

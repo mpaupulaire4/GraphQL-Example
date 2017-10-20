@@ -31,7 +31,7 @@ export class BaseModel {
 
     async find({id, ...data} = {}){
         if (id){
-            return this.findById(id)
+            return Promise.all([ this.findById(id) ])
         }
 
         let query = this._collection

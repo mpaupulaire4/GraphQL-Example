@@ -34,23 +34,32 @@ const User =`
         # List of the User's friends
         friends: [User!]
     }
+`
 
+const Queries = `
     extend type Query {
         # Get a list of all User's
         users: [User!]!
 
         # Get a specific user by ID
         user(
-            # ID of the user you are looking for
+            # User ID
             id: ID!
         ): User
     }
 `
 
+const Mutations = `
+
+`
+
 const FacebookProviderInfo = `
+    # Various Facebook Specific info
     type FacebookProviderInfo {
         # User's facebook id
         id: ID!
+
+        # Link to user's Facebook profile
         link: String
     }
 `
@@ -72,4 +81,4 @@ export const UserResolvers = {
 }
 
 
-export const UserSchema = ()=> [ User, FacebookProviderInfo, EventSchema]
+export const UserSchema = ()=> [ User, FacebookProviderInfo, Queries, Mutations, EventSchema]
