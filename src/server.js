@@ -88,8 +88,8 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
         // User should be set to null or properly deserialized
         current_user: req.user,
         User: UserModel,
-        Event: new Event(),
-        Convo: new Convo()
+        Event: new Event(req.user),
+        Convo: new Convo(req.user)
       },
     };
   }));

@@ -6,8 +6,8 @@ export const database = FirebaseRef.firestore()
 
 export class BaseModel {
     constructor(current_user_id){
-        this._current_user_id = current_user_id;
         this.loaderById = new DataLoader(this._findByIds)
+        this._current_user_id = current_user_id.id
     }
 
     _prime(instance = {}){
