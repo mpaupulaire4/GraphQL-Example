@@ -16,15 +16,14 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
     }, (accessToken, refreshToken, profile, done) => {
         const profileObj = profile._json
         const UserModel = new User();
-        UserModel.DataInstance
         FBProfileToUser(profileObj, UserModel).then((user) => {
             done(null, user)
+            ProcessFriendsList(profileObj.friends, user, UserModel).catch((error) => {
+                console.log(error)
+            })
         }).catch((error) => {
             done(null, false, error)
         })
-
-        ProcessFriendsList(profileObj.friends, UserModel)
-        UpdateFacebookInfo(profileObj, UserModel)
     }))
 
     passport.serializeUser((user, done) => {
@@ -32,7 +31,7 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
     });
     passport.deserializeUser((id, done) => {
         new User().findById(id).then((user) => {
-            done(null, user.json());
+            done(null, user);
         })
     });
 
@@ -74,21 +73,11 @@ function FBProfileToUser({id, last_name, first_name, name, email, picture, link}
     }
     return UserModel.findOne({'facebook.id': id}).then((user) => {
         if (user){
+            user.update(userInfo)
             return user
         }
-
         const newUser = new UserModel.DataInstance(userInfo);
         newUser.save().catch(error => console.log(error));
-        return newUser.json()
+        return newUser
     })
-}
-
-async function ProcessFriendsList(friends) {
-    // console.log('FRIEND DATA:', JSON.stringify(friends, null, 2))
-    // Go through the list and process this user's friends list
-}
-
-async function UpdateFacebookInfo({id, link}) {
-    console.log(JSON.stringify({id, link}, null, 2))
-    // Update some information that may need updating when logged in
 }

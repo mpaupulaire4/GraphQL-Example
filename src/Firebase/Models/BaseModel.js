@@ -8,6 +8,12 @@ export class BaseModel {
         this.loaderById = new DataLoader(this._findByIds)
     }
 
+    _prime(instance = {}){
+        if (instance.id){
+            this.loaderById.prime(instance.id, instance)
+        }
+    }
+
     _findByIds = async (ids = []) => {
         return Promise.all(ids.map((id) => this._findById(id)))
     }

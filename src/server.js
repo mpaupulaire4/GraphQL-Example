@@ -80,13 +80,17 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
     //   clientSecret: GITHUB_CLIENT_SECRET,
     // });
 
+    // Prime the data Loader in the user model with the current signed in user
+    const UserModel = new User(req.user && req.user.id);
+    UserModel._prime(req.user)
+
     return {
       schema,
       tracing: true,
       context: {
         // User should be set to null or properly deserialized
         current_user: req.user,
-        User: new User(),
+        User: UserModel,
         Event: new Event(),
         Convo: new Convo()
       },
