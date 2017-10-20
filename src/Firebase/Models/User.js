@@ -1,13 +1,25 @@
 import { BaseModel } from './BaseModel'
 
 export default class User extends BaseModel {
+
+    constructor(current_user = {}) {
+        super()
+        this._current_user_id = current_user.id;
+    }
     get _collection_path() {
         return 'users'
     }
 
-    constructor(current_user_id) {
-        super()
-        this.current_user_id = current_user_id;
+    is_friends_with(user, other_user){
+        let user1 = user
+        if (user instanceof this.DataInstance){
+            user1 = user._data;
+        }
+        return typeof user.friends[other_user.id] === 'boolean'
+    }
+
+    is_user(user, other_user){
+        return user.id === other_user.id
     }
 
     async getUserFriendsById(id){
@@ -21,16 +33,16 @@ export default class User extends BaseModel {
             const promises = [];
             friends.forEach((friend) => {
                 !user.json().friends && user.update({friends: {}})
-                if (user.json().friends[friend.id]){
+                if (typeof user.json().friends[friend.id] === 'boolean'){
                     return
                 }
                 promises.push(this.findOne({'facebook.id': friend.id}).then((friend_instance) => {
                     if (friend_instance){
-                        user.update({
-                            facebook: {
+                        return user.update({
+                            friends: {
                                 [friend_instance.id]: true
                             }
-                        }).catch((error) => console.log(error))
+                        })
                     }
                 }))
             })
@@ -41,20 +53,35 @@ export default class User extends BaseModel {
     get DataInstance(){
         const Parent = this;
         class DataInstance extends super.DataInstance {
+            _is_user(value, otherwise = undefined){
+                if (this.id === Parent._current_user_id){
+                    return value
+                }
+                return otherwise
+            }
+            _is_friends_with(value, otherwise = undefined){
+                if (typeof this._data.friends[Parent._current_user_id] === 'boolean'){
+                    return value
+                }
+                return this._is_user(value, otherwise)
+            }
             get name(){
-                return this._data.name
+                return this._is_friends_with(
+                    this._data.name || `${this._data.first_name || ''} ${this._data.last_name || ''}`,
+                    null
+                )
             }
             get first_name() {
                 return this._data.first_name
             }
             get last_name() {
-                return this._data.last_name
+                return this._is_friends_with(this._data.last_name, null)
             }
             get display_name() {
-                return `${this._data.first_name || ''} ${this._data.last_name || ''}`
+                return this._is_friends_with(this.name, this.first_name)
             }
             get email() {
-                return this._data.email
+                return this._is_friends_with(this._data.email, null)
             }
             get facebook() {
                 return this._data.facebook

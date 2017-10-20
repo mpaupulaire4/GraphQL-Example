@@ -69,10 +69,6 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
     //   throw new Error('Query too large.');
     // }
 
-    if (!req.user) {
-      req.logout()
-    }
-
     // Initialize a new GitHub connector instance for every GraphQL request, so that API fetches
     // are deduplicated per-request only.
     // const gitHubConnector = new GitHubConnector({
@@ -80,8 +76,9 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
     //   clientSecret: GITHUB_CLIENT_SECRET,
     // });
 
+    // Set the id of the current signed in user in the user model for security use
+    const UserModel = new User(req.user);
     // Prime the data Loader in the user model with the current signed in user
-    const UserModel = new User(req.user && req.user.id);
     UserModel._prime(req.user)
 
     return {

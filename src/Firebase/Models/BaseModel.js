@@ -10,7 +10,7 @@ export class BaseModel {
     }
 
     _prime(instance = {}){
-        if (instance.id){
+        if (instance instanceof this.DataInstance){
             this.loaderById.prime(instance.id, instance)
         }
     }

@@ -22,6 +22,7 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
                 console.log(error)
             })
         }).catch((error) => {
+            console.log(error)
             done(null, false, error)
         })
     }))
@@ -30,7 +31,7 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
         done(null, user.id);
     });
     passport.deserializeUser((id, done) => {
-        new User().findById(id).then((user) => {
+        new User({id}).findById(id).then((user) => {
             done(null, user);
         })
     });
