@@ -1,5 +1,6 @@
 import { FirebaseRef } from '../'
 import DataLoader from 'dataloader'
+import { merge } from 'lodash'
 
 export const database = FirebaseRef.firestore()
 
@@ -107,18 +108,21 @@ export class BaseModel {
             }
 
             set(data) {
-                this._create()
-                this._doc.set(data)
                 this._data = data
+                if (this._doc){
+                    this._doc.set(data)
+                }
             }
 
             update(data){
-                this._data = {...this._data, ...data}
-                this.save()
+                this._data = merge(this._data, data)
+                if (this._doc){
+                    this.save()
+                }
             }
 
             json(){
-                return {...this._data, id: this._doc && this._doc.id}
+                return {...this._data, id: this.id}
             }
         }
         return DataInstance;

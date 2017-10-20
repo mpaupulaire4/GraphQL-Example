@@ -65,8 +65,6 @@ export const UserResolvers = {
         },
     },
     User: {
-        name: (user) => user.name || `${user.first_name} ${user.last_name}`,
-        display_name: (user) => `${user.first_name}`,
         events: (user, args, context) => {
             return []
         }
