@@ -5,9 +5,11 @@ import { merge } from 'lodash'
 export const database = FirebaseRef.firestore()
 
 export class BaseModel {
-    constructor(current_user_id){
+    constructor(current_user){
         this.loaderById = new DataLoader(this._findByIds)
-        this._current_user_id = current_user_id.id
+        if (current_user && current_user.id){
+            this._current_user_id = current_user.id
+        }
     }
 
     _prime(instance = {}){
