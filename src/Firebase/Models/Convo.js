@@ -7,7 +7,7 @@ export default class Convo extends BaseModel {
 
     get DataInstance() {
         const Parent = this;
-        class DataInstance {
+        class DataInstance extends super.DataInstance{
 
         }
         return DataInstance;
