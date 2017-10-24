@@ -70,6 +70,7 @@ export class BaseModel {
     _doc_to_instance(doc){
         const instance = new this.DataInstance(doc.data())
         instance._doc = doc.ref;
+        this._prime(instance)
         return instance
     }
 

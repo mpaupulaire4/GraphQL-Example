@@ -1,7 +1,12 @@
-import { BaseModel } from './BaseModel'
+import { BaseModel } from '../BaseModel'
+import Message from './Messages'
 import * as firebase from 'firebase-admin'
 
 export default class Convo extends BaseModel {
+    constructor(...args){
+        super(...args)
+        this.Message = new Message({id: this._current_user_id})
+    }
     get _collection_path(){
         return 'conversations'
     }
@@ -49,10 +54,27 @@ export default class Convo extends BaseModel {
         })
     }
 
+    async post_message(message){
+        return this.findById(message.conversation_id).then((convo) => {
+            if (!convo){
+                throw new Error('No Such Conversation')
+            }
+            return this.Message.post(message)
+        })
+    }
+
     get DataInstance() {
         const Parent = this;
         class DataInstance extends super.DataInstance{
-
+            get title(){
+                return this._data.title
+            }
+            get messages(){
+                return Parent.Message.byConvoID(this.id)
+            }
+            get participants(){
+                return this._data.participants
+            }
         }
         return DataInstance;
     }

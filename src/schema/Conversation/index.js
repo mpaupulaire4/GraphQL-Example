@@ -6,17 +6,46 @@ const Conversation = `
         messages: [Message!]!
         participants: [Participant!]!
     }
+`
 
+const Queries = `
     extend type Query {
-        conversations: [Conversation!]!
-        conversation(id: ID!): Conversation
+        conversations(
+            search: ConvoSearch = {}
+        ): [Conversation!]!
+        conversation(
+            id: ID!
+        ): Conversation
     }
 `
+
+const Mutations = `
+    extend type Mutation {
+        post_message(message: MessagePost!): Message
+    }
+`
+
+const InputTypes = `
+    input ConvoSearch {
+        id: ID
+        title: String
+        text: String
+        limit: Int = 1000
+        offset: Int = 0
+    }
+
+    input MessagePost {
+        conversation_id: ID!
+        text: String!
+    }
+`
+
 const Message = `
     type Message {
+        id: ID!
         text: String!
         owner: ID!
-        timestamp: String!
+        timestamp: DateTime!
     }
 `
 
@@ -25,27 +54,32 @@ const Participant = `
         id: ID!
         display_name: String!
         photo_url: String!
-        last_viewed: String!
+        last_viewed: DateTime!
     }
 `
 
 export const ConversationResolvers = {
     Query: {
-        conversation: (_, args, context) => {
-            return null
+        conversation: (_, {id}, {Convo}) => {
+            return Convo.findById(id)
         },
-        conversations: (_, args, context) => {
-            return []
+        conversations: (_, {search}, {Convo}) => {
+            return Convo.find(search)
+        }
+    },
+    Mutation: {
+        post_message: (_, {message}, {Convo}) => {
+            return Convo.post_message(message)
         }
     },
     Conversation: {
-        messages: (convo, args, context) => {
-            return []
-        },
-        participants: (convo, args, context) => {
-            return []
+        participants: (convo, args, {User}) => {
+            return User.findByIds(Object.keys(convo.participants || {})).then((data) => data.map((user) => {
+                user.last_viewed = convo.participants[user.id]
+                return user
+            }))
         }
-    }
+    },
 }
 
-export const ConversationSchema = () => [Conversation, Participant, Message]
+export const ConversationSchema = () => [Conversation, Participant, Queries, Mutations, InputTypes, Message]
