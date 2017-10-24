@@ -60,7 +60,7 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
 }
 
 
-function FBProfileToUser({id, last_name, first_name, name, email, picture, link}, UserModel){
+async function FBProfileToUser({id, last_name, first_name, name, email, picture, link}, UserModel){
     const userInfo = {
         name,
         first_name,
@@ -78,7 +78,8 @@ function FBProfileToUser({id, last_name, first_name, name, email, picture, link}
             return user
         }
         const newUser = new UserModel.DataInstance(userInfo);
-        newUser.save().catch(error => console.log(error));
-        return newUser
+        return newUser.save().then(() => {
+            return newUser
+        }).catch(error => console.log(error));
     })
 }

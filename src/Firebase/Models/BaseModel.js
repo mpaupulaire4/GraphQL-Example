@@ -32,7 +32,7 @@ export class BaseModel {
         return this.loaderById.load(id)
     }
 
-    async find({id, ...data} = {}){
+    async find({id, offset, limit,  ...data} = {}){
         if (id){
             return Promise.all([ this.findById(id) ])
         }
@@ -89,38 +89,37 @@ export class BaseModel {
                     this._data = data._data;
                     this._doc = data._doc;
                     return
+                } else if (data instanceof Object){
+                    this._data = data;
+                    this._doc = null
+                    return
                 }
-                this._data = data;
-                this._doc = null
+                throw new Error('Invalid Data object for Model Instance')
             }
 
             get id() {
                 return this._doc && this._doc.id
             }
 
-            _create(){
+            async save(id = undefined) {
                 if (!this._doc){
-                    this._doc = Parent._collection.doc();
-                    this._doc.set({})
+                    this._doc = await Parent._collection.doc(id);
+                    return this._doc.set(this._data)
                 }
-            }
-
-            save() {
-                this._create()
                 return this._doc.update(this._data)
             }
 
-            set(data) {
+            async set(data={}) {
                 this._data = data
                 if (this._doc){
-                    this._doc.set(data)
+                    return this._doc.set(data)
                 }
             }
 
-            update(data){
-                this._data = merge(this._data, data)
+            async update(data){
+                this._data = merge({}, this._data, data)
                 if (this._doc){
-                    this.save()
+                    return this.save()
                 }
             }
 

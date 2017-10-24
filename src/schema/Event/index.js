@@ -1,7 +1,6 @@
 import { UserSchema } from '../User'
 import { ConversationSchema } from '../Conversation'
 
-
 const Event = `
     type Event {
         # Event ID
@@ -17,10 +16,10 @@ const Event = `
         description: String
 
         # This events location info
-        loaction: Location!
+        location: Location!
 
         # This Event's time/date
-        time: String!
+        time: DateTime!
 
         # List of Users participating in the event
         participants: [User!]!
@@ -33,7 +32,7 @@ const Queries = `
     extend type Query {
         # Query all events
         events(
-            filter: EventSearchInput
+            filter: EventSearchInput = {}
         ): [Event!]!
 
         events_by_location(
@@ -98,7 +97,7 @@ const EventInput = `
         title: String!
         description: String = ""
         visibility: Visibility = PUBLIC
-        time: String!
+        time: DateTime!
         location: LocationInput!
     }
 
@@ -107,7 +106,7 @@ const EventInput = `
         title: String
         description: String
         visibility: Visibility
-        time: String
+        time: DateTime
         location: LocationInput
     }
 
@@ -123,7 +122,7 @@ const EventInput = `
 
         # Will search in between these 2 times.
         # Will only use first 2 positions
-        time: [String!]
+        time: [DateTime!]
 
         # For pagination - where to begin search
         offset: Int = 0
@@ -157,30 +156,49 @@ const Location = `
 
 export const EventResolvers = {
     Query: {
-        events: (_, {filter}, context) => {
-            console.log(filter)
-            return []
+        events: (_, {filter}, {Event}) => {
+            return Event.find()
         },
     },
     Mutation: {
-        create_event: (_, {event, invites}, context) => {
-            console.log(event, 'invites:', invites)
+        create_event: async (_, {event, invites}, {current_user, Event, User, Convo}) => {
+            return Event.create(event).then((new_event) => {
+                Convo.create({
+                    title: new_event.title,
+                    id: new_event.id
+                })
+                return new_event
+            })
         },
-        join_event: (_, {id}, context) => {
-            console.log(id)
+        join_event: (_, {id}, {Event, Convo}) => {
+            return Event.join(id).then((event) => {
+                Convo.join(event.id)
+                return event
+            })
         },
-        leave_event: (_, {id}, context) => {
-            console.log(id)
+        leave_event: (_, {id}, {Event, Convo}) => {
+            return Event.leave(id).then((event) => {
+                Convo.leave(event.id)
+                return event
+            })
         },
-        update_event: (_, {event}, context) => {
-            console.log(event)
+        update_event: (_, {event}, {Event}) => {
+            return Event.update(event)
         },
-        kick_from_event: (_, {event_id, participant_id}) => {
-            console.log(event_id, participant_id)
+        kick_from_event: (_, {event_id, participant_id}, {Event, Convo}) => {
+            return Event.kick(event_id, participant_id).then((event) => {
+                Convo.kick(event.id, participant_id)
+                return event;
+            })
         }
     },
     Event: {
-
+        host: (event, args,  {User}) => {
+            return User.findById(event.host)
+        },
+        participants: (event, args, {User}) => {
+            return User.findByIds(Object.keys(event.participants))
+        },
     },
     Location: {
         city_state: (location) => location.city_state || `${location.city}, ${location.state}`
