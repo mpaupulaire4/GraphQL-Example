@@ -16,11 +16,9 @@ import { ConversationSchema, ConversationResolvers } from './Conversation'
 // END TYPE DEFS
 
 // TEMPORARY
-import { PubSub } from 'graphql-subscriptions';
+import { pubsub } from '../subscriptions';
 const messages = [];
-const pubsub = new PubSub();
-const MESSAGE_ADDED_TOPIC = 'message-added';
-
+const MESSAGE_ADDED_TOPIC = 'message_added';
 // END TEMPORARY
 
 const DateTypes = `
@@ -35,7 +33,11 @@ type Query {
 }
 
 type Subscription {
-    messageAdded(ID: Int): String
+    messageAdded: Temp
+}
+
+type Temp {
+  text: String
 }
 
 type Mutation {
@@ -57,7 +59,7 @@ const RootResolvers = {
   Mutation: {
     addMessage: (_, { text }, context) => {
       messages.push(text)
-      pubsub.publish(MESSAGE_ADDED_TOPIC, {messageAdded: text} );
+      pubsub.publish(MESSAGE_ADDED_TOPIC, { messageAdded:{ text} });
       return messages
     }
   },
