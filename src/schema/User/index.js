@@ -66,12 +66,11 @@ export const UserResolvers = {
         users: (_, args, { User, ...context}) => {
             return User.find()
         },
-        user: (_, args, { User, ...context}) => {
-            return User.find({id: args.id});
+        user: (_, {id}, { User, ...context}) => {
+            return User.find({id});
         },
     },
-    User: {
-    }
+    User: {}
 }
 
 

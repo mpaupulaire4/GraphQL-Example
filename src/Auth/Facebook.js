@@ -11,7 +11,7 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
     passport.use(new PassportFacebook.Strategy({
         clientID: FACEBOOK_APP_ID,
         clientSecret: FACEBOOK_APP_SECRET,
-        callbackURL: process.env.NODE_ENV !== 'production' ? 'http://localhost:3100/auth/facebook/callback' : 'http://PROD_URL/login/github/callback',
+        callbackURL: process.env.NODE_ENV !== 'production' ? 'http://localhost:3100/auth/facebook/callback' : 'http://PROD_URL/auth/facebook/callback',
         profileFields: ['id', 'displayName', 'email', 'name', 'profileUrl', 'photos', 'friends']
     }, (accessToken, refreshToken, profile, done) => {
         const profileObj = profile._json
