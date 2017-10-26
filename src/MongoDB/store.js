@@ -2,14 +2,14 @@ import session from 'express-session'
 import MongoDBStoreCreator from 'connect-mongodb-session'
 const MongoDBStore = MongoDBStoreCreator(session)
 
-export function setUpSessionStore(app, {SESSION_STORE_SECRET, MONGODB_URL} = {}) {
-    const store = null
-    // const store = new MongoDBStore({
-    //     uri: MONGODB_URL,
-    //     collection: 'UserSessions'
-    // }, (error) => {
-    //     // do something if it can't connect?
-    // })
+export function setUpSessionStore(app, {SESSION_STORE_SECRET, MONGODB_URI} = {}) {
+    const store = new MongoDBStore({
+        uri: MONGODB_URI,
+        collection: 'user_sessions'
+    }, (error) => {
+        // do something if it can't connect?
+        console.log(error)
+    })
 
     app.use(session({
         secret: SESSION_STORE_SECRET,
