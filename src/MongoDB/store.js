@@ -8,7 +8,9 @@ export function setUpSessionStore(app, {SESSION_STORE_SECRET, MONGODB_URI} = {})
         collection: 'user_sessions'
     }, (error) => {
         // do something if it can't connect?
-        console.log(error)
+        if (error){
+            console.log(error)
+        }
     })
 
     app.use(session({

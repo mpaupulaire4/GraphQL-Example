@@ -13,7 +13,8 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
 
 import { initAuth } from './Auth'
-import { User, Event, Convo } from './Firebase/Models'
+import { Event, Convo } from './Firebase/Models'
+import { User } from './MongoDB/Models'
 import schema from './schema';
 // import queryMap from '../extracted_queries.json';
 // import engineConfig from './engineConfig';
@@ -35,19 +36,19 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
   const app = express();
 
   if (ENGINE_API_KEY) {
-    const fullEngineConfig = Object.assign({}, {
+    const fullEngineConfig ={
       apiKey: ENGINE_API_KEY,
       logcfg: {
         level: 'DEBUG',
       },
-    });
+    };
     const engine = new Engine({
       engineConfig: fullEngineConfig,
       endpoint: '/graphql',
       graphqlPort: port,
     });
-    engine.start();
-    app.use(engine.expressMiddleware());
+    // engine.start();
+    // app.use(engine.expressMiddleware());
   }
   app.use(compression());
 
@@ -71,17 +72,17 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
 
 
     // Set the id of the current signed in user in the user model for security use
-    const UserModel = new User(req.user);
+    // const UserModel = new User(req.user);
     // Prime the data Loader in the user model with the current signed in user
-    UserModel._prime(req.user)
+    // UserModel._prime(req.user)
 
     return {
       schema,
-      tracing: true,
+      // tracing: true,
       context: {
         // User should be set to null or properly deserialized
         current_user: req.user,
-        User: UserModel,
+        User: User,
         Event: new Event(req.user),
         Convo: new Convo(req.user)
       },

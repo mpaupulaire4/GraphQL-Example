@@ -1,6 +1,6 @@
 import passport from 'passport'
 import PassportFacebook from 'passport-facebook'
-import { User } from '../Firebase/Models'
+import { User } from '../MongoDB/Models'
 
 export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
     if (!FACEBOOK_APP_ID || !FACEBOOK_APP_SECRET) {
@@ -15,12 +15,11 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
         profileFields: ['id', 'displayName', 'email', 'name', 'profileUrl', 'photos', 'friends']
     }, (accessToken, refreshToken, profile, done) => {
         const profileObj = profile._json
-        const UserModel = new User();
-        FBProfileToUser(profileObj, UserModel).then((user) => {
+        FBProfileToUser(profileObj).then((user) => {
             done(null, user)
-            UserModel.ProccessFBFriendsForUser(user.id, profileObj.friends.data).catch((error) => {
-                console.log(error)
-            })
+            // User.ProccessFBFriendsForUser(user.id, profileObj.friends.data).catch((error) => {
+            //     console.log(error)
+            // })
         }).catch((error) => {
             console.log(error)
             done(null, false, error)
@@ -31,8 +30,11 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
         done(null, user.id);
     });
     passport.deserializeUser((id, done) => {
-        new User({id}).findById(id).then((user) => {
+        User.findById(id).then((user) => {
             done(null, user);
+        }).catch(error => {
+            console.log(error)
+            done(error, false)
         })
     });
 
@@ -60,7 +62,7 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
 }
 
 
-async function FBProfileToUser({id, last_name, first_name, name, email, picture, link}, UserModel){
+async function FBProfileToUser({id, last_name, first_name, name, email, picture, link}){
     const userInfo = {
         name,
         first_name,
@@ -72,14 +74,12 @@ async function FBProfileToUser({id, last_name, first_name, name, email, picture,
             link
         }
     }
-    return UserModel.findOne({'facebook.id': id}).then((user) => {
+    return User.findOne({'facebook.id': id}).then((user) => {
         if (user){
             user.update(userInfo)
             return user
         }
-        const newUser = new UserModel.DataInstance(userInfo);
-        return newUser.save().then(() => {
-            return newUser
-        }).catch(error => console.log(error));
+        const newUser = new User(userInfo)
+        return newUser.save()
     })
 }
