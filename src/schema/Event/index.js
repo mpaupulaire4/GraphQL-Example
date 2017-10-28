@@ -62,7 +62,7 @@ const Mutations = `
             # Info on the event to create
             event: EventCreateInput!
 
-            # A List of User ID's to send invites to
+            # A List of User IDs to send invites to
             invites: [ID!] = []
         ): Event
 

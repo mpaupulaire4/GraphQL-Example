@@ -13,8 +13,8 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
 
 import { initAuth } from './Auth'
-import { Event, Convo } from './Firebase/Models'
-import { User } from './MongoDB/Models'
+import { Convo } from './Firebase/Models'
+import { User, Event } from './MongoDB/Models'
 import schema from './schema';
 // import queryMap from '../extracted_queries.json';
 // import engineConfig from './engineConfig';
@@ -83,7 +83,7 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
         // User should be set to null or properly deserialized
         current_user: req.user,
         User: User,
-        Event: new Event(req.user),
+        Event: Event,
         Convo: new Convo(req.user)
       },
     };

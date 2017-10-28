@@ -27,8 +27,8 @@ export default class User extends BaseModel {
     async ProccessFBFriendsForUser(id, friends = []){
         return this.findById(id).then((user) => {
             const promises = [];
+            !user.json().friends && user.update({friends: {}})
             friends.forEach((friend) => {
-                !user.json().friends && user.update({friends: {}})
                 if (typeof user.json().friends[friend.id] === 'boolean'){
                     return
                 }

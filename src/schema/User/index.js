@@ -47,7 +47,9 @@ const Queries = `
 `
 
 const Mutations = `
+    extend type Mutation {
 
+    }
 `
 
 const FacebookProviderInfo = `
@@ -67,10 +69,15 @@ export const UserResolvers = {
             return User.find()
         },
         user: (_, {id}, { User, ...context}) => {
-            return User.find({id});
+            return User.findById(id);
         },
     },
-    User: {}
+    User: {
+        name: (user, args, {current_user}) => user.can_view(current_user, user.name),
+        display_name: (user, args, {current_user}) => user.can_view(current_user, user.name, user.first_name),
+        email: (user, args, {current_user}) => user.can_view(current_user, user.email),
+        friends: (user, args, {current_user}) => user.is_me(current_user, user.friends, []),
+    }
 }
 
 
