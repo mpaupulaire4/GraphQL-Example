@@ -25,7 +25,9 @@ export const LocationSchema = new Schema({
     state: String,
     zip: Number
 }, {
-    typeKey: '$type'
+    typeKey: '$type',
+    _id: false,
+    id: false
 })
 
 //region STATICS
@@ -47,6 +49,9 @@ LocationSchema.virtual('latitude').get(function(){
 })
 LocationSchema.virtual('latitude').set(function(value){
     return this.coordinates[1] = value
+})
+LocationSchema.virtual('city_state').get(function(){
+    return `${this.city||''}, ${this.state||''}`
 })
 
 //endregion

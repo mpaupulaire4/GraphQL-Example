@@ -32,7 +32,25 @@ export const EventSchema = new Schema({
 
 //region STATICS
 
+EventSchema.statics.join = function(event_id, user_id) {
+    return this.findByIdAndUpdate(event_id,{
+        $addToSet: {
+            participants: user_id
+        }
+    },{
+        new: true
+    })
+}
 
+EventSchema.statics.leave = function(event_id, user_id) {
+    return this.findByIdAndUpdate(event_id,{
+        $pull: {
+            participants: user_id
+        }
+    },{
+        new: true
+    })
+}
 
 //endregion
 
@@ -44,7 +62,13 @@ export const EventSchema = new Schema({
 
 //region METHODS
 
+EventSchema.methods.is_host = function(user) {
 
+}
+
+EventSchema.methods.is_participant = function(user) {
+
+}
 
 //endregion
 

@@ -96,7 +96,7 @@ const EventInput = `
     input EventCreateInput {
         title: String!
         description: String = ""
-        visibility: Visibility = PUBLIC
+        visibility: Visibility = PRIVATE
         time: DateTime!
         location: LocationInput!
     }
@@ -162,7 +162,7 @@ export const EventResolvers = {
     },
     Mutation: {
         create_event: async (_, {event, invites}, {current_user, Event, User, Convo}) => {
-            return Event.create(event).then((new_event) => {
+            return Event.create({...event, host: current_user.id}).then((new_event) => {
                 Convo.create({
                     title: new_event.title,
                     id: new_event.id
@@ -170,23 +170,23 @@ export const EventResolvers = {
                 return new_event
             })
         },
-        join_event: (_, {id}, {Event, Convo}) => {
-            return Event.join(id).then((event) => {
+        join_event: (_, {id}, {Event, Convo, current_user}) => {
+            return Event.join(id, current_user.id).then((event) => {
                 Convo.join(event.id)
                 return event
             })
         },
-        leave_event: (_, {id}, {Event, Convo}) => {
-            return Event.leave(id).then((event) => {
+        leave_event: (_, {id}, {Event, Convo, current_user}) => {
+            return Event.leave(id, current_user.id).then((event) => {
                 Convo.leave(event.id)
                 return event
             })
         },
-        update_event: (_, {event}, {Event}) => {
-            return Event.update(event)
+        update_event: (_, {event: {id, ...event}}, {Event}) => {
+            return Event.findByIdAndUpdate(id, event, {new: true})
         },
         kick_from_event: (_, {event_id, participant_id}, {Event, Convo}) => {
-            return Event.kick(event_id, participant_id).then((event) => {
+            return Event.leave(event_id, participant_id).then((event) => {
                 Convo.kick(event.id, participant_id)
                 return event;
             })
@@ -197,7 +197,7 @@ export const EventResolvers = {
             return User.findById(event.host)
         },
         participants: (event, args, {User}) => {
-            return User.findByIds(Object.keys(event.participants))
+            return User.findByIds(event.participants)
         },
     },
     Location: {
