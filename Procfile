@@ -1,1 +1,1 @@
-web: node ./dist/index.js
+web: npm build && node ./dist/index.js
