@@ -2,15 +2,19 @@
   "name": "graphql-server",
   "version": "1.0.0",
   "description": "A server that implements graphql",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
-    "start": "nodemon ./index.js --exec babel-node -e js",
+    "start": "nodemon ./src/index.js --exec babel-node -e js",
+    "build": "babel src -d dist -s",
+    "serve": "node ./dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Michel Paupulaire",
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "dotenv": "^4.0.0",
