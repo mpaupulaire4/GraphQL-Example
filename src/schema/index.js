@@ -1,6 +1,13 @@
 import { merge } from 'lodash';
 import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools';
 
+// DATE TYPES
+import {
+  GraphQLDate,
+  GraphQLTime,
+  GraphQLDateTime
+} from 'graphql-iso-date';
+
 // TYPE DEFS
 import { EventSchema, EventResolvers } from './Event'
 import { UserSchema, UserResolvers } from './User'
@@ -9,22 +16,28 @@ import { ConversationSchema, ConversationResolvers } from './Conversation'
 // END TYPE DEFS
 
 // TEMPORARY
-import { PubSub } from 'graphql-subscriptions';
+import { pubsub } from '../subscriptions';
 const messages = [];
-const pubsub = new PubSub();
+const MESSAGE_ADDED_TOPIC = 'message_added';
 // END TEMPORARY
 
+const DateTypes = `
+  scalar DateTime
+  scalar Date
+  scalar Time
+`
 const RootSchema = `
-
 type Query {
-    hello: String
-
     # Get the currently logged in user (null if none)
-    currentUser: User
+    current_user: User
 }
 
 type Subscription {
-    messageAdded(ID: Int): String
+    messageAdded: Temp
+}
+
+type Temp {
+  text: String
 }
 
 type Mutation {
@@ -36,20 +49,17 @@ schema {
     subscription: Subscription
     mutation: Mutation
 }
-
 `;
 
-const MESSAGE_ADDED_TOPIC = 'message-added';
 
 const RootResolvers = {
   Query: {
-    hello: () => Math.random() < 0.5 ? 'Take it easy' : 'Salvation lies within',
-    currentUser: (_, args, {user}) => user
+    current_user: (_, args, {current_user}) => current_user
   },
   Mutation: {
     addMessage: (_, { text }, context) => {
       messages.push(text)
-      pubsub.publish(MESSAGE_ADDED_TOPIC, {messageAdded: text} );
+      pubsub.publish(MESSAGE_ADDED_TOPIC, { messageAdded:{ text} });
       return messages
     }
   },
@@ -58,12 +68,16 @@ const RootResolvers = {
       subscribe: () => pubsub.asyncIterator(MESSAGE_ADDED_TOPIC),
     },
   },
+  Date: GraphQLDate,
+  Time: GraphQLTime,
+  DateTime: GraphQLDateTime
 };
 
 // Put schema together into one array of schema strings
 // and one map of resolvers, like makeExecutableSchema expects
 const schema = [
     RootSchema,
+    DateTypes,
     EventSchema,
     UserSchema,
     ConversationSchema
@@ -82,6 +96,6 @@ const executableSchema = makeExecutableSchema({
 });
 
 // FOR TESTING SCHEMA
-addMockFunctionsToSchema({schema: executableSchema})
+// addMockFunctionsToSchema({schema: executableSchema})
 
 export default executableSchema;

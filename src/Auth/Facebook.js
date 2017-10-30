@@ -1,5 +1,6 @@
 import passport from 'passport'
 import PassportFacebook from 'passport-facebook'
+import { User } from '../MongoDB/Models'
 
 export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
     if (!FACEBOOK_APP_ID || !FACEBOOK_APP_SECRET) {
@@ -10,20 +11,31 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
     passport.use(new PassportFacebook.Strategy({
         clientID: FACEBOOK_APP_ID,
         clientSecret: FACEBOOK_APP_SECRET,
-        callbackURL: process.env.NODE_ENV !== 'production' ? 'http://localhost:3100/auth/facebook/callback' : 'http://PROD_URL/login/github/callback',
+        callbackURL: process.env.NODE_ENV !== 'production' ? 'http://localhost:3100/auth/facebook/callback' : 'http://PROD_URL/auth/facebook/callback',
         profileFields: ['id', 'displayName', 'email', 'name', 'profileUrl', 'photos', 'friends']
     }, (accessToken, refreshToken, profile, done) => {
-        // console.log(JSON.stringify(profile._json, null, 2));
-        const user = FBProfileToUser(profile._json)
-        ProcessFriendsList(profile._json.friends)
-        done(null, {id: profile._json.id, ...user})
+        const profileObj = profile._json
+        FBProfileToUser(profileObj).then((user) => {
+            done(null, user)
+            user.ProcessFBFriends(profileObj.friends.data).catch((error) => {
+                console.log(error)
+            })
+        }).catch((error) => {
+            console.log(error)
+            done(null, false, error)
+        })
     }))
 
     passport.serializeUser((user, done) => {
         done(null, user.id);
     });
     passport.deserializeUser((id, done) => {
-        done(null, {id});
+        User.findById(id).then((user) => {
+            done(null, user);
+        }).catch(error => {
+            console.log(error)
+            done(error, false)
+        })
     });
 
     app.use(passport.initialize());
@@ -50,17 +62,24 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
 }
 
 
-function FBProfileToUser({id, last_name, first_name, name, email, picture, link, friends, ...profile}){
-    return {
+async function FBProfileToUser({id, last_name, first_name, name, email, picture, link}){
+    const userInfo = {
         name,
         first_name,
         last_name,
         email,
         photo_url: picture.data.url,
+        facebook: {
+            id,
+            link
+        }
     }
-}
-
-async function ProcessFriendsList(friends) {
-    console.log('FRIEND DATA:', JSON.stringify(friends, null, 2))
-    // Go through the list and process this user's friends list
+    return User.findOne({'facebook.id': id}).then((user) => {
+        if (user){
+            user.update(userInfo)
+            return user
+        }
+        const newUser = new User(userInfo)
+        return newUser.save()
+    })
 }

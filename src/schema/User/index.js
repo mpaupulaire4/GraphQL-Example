@@ -25,45 +25,60 @@ const User =`
         # URL for a User's phto
         photo_url: String
 
-        # User's email
-        email: String
-
-        # List of events
-        events: [Event!]
+        # User's Facebook Info
+        facebook: FacebookProviderInfo!
 
         # List of the User's friends
-        friends: [User!]!
+        friends: [User!]
     }
+`
 
+const Queries = `
     extend type Query {
         # Get a list of all User's
         users: [User!]!
 
         # Get a specific user by ID
         user(
-            # ID of the user you are looking for
+            # User ID
             id: ID!
         ): User
     }
 `
 
+const Mutations = `
+    extend type Mutation {
+
+    }
+`
+
+const FacebookProviderInfo = `
+    # Various Facebook Specific info
+    type FacebookProviderInfo {
+        # User's facebook id
+        id: ID!
+
+        # Link to user's Facebook profile
+        link: String
+    }
+`
+
 export const UserResolvers = {
     Query: {
-        users: (_, args, context) => {
-            return []
+        users: (_, args, { User, ...context}) => {
+            return User.find()
         },
-        user: (_, args, context) => {
-            return null
+        user: (_, {id}, { User, ...context}) => {
+            return User.findById(id);
         },
     },
     User: {
-        name: (user) => user.name || `${user.first_name} ${user.last_name}`,
-        display_name: (user) => `${user.first_name}`,
-        events: (user) => {
-            return []
-        }
+        name: (user, args, {current_user}) => user.can_view(current_user, user.name),
+        display_name: (user, args, {current_user}) => user.can_view(current_user, user.name, user.first_name),
+        email: (user, args, {current_user}) => user.can_view(current_user, user.email),
+        friends: (user, args, {current_user}) => user.is_me(current_user, user.friends, []),
     }
 }
 
 
-export const UserSchema = ()=> [ User, EventSchema]
+export const UserSchema = ()=> [ User, FacebookProviderInfo, Queries, Mutations, EventSchema]

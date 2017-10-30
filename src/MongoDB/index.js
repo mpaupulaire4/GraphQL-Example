@@ -1,21 +1,20 @@
-import session from 'express-session'
-import MongoDBStoreCreator from 'connect-mongodb-session'
-const MongoDBStore = MongoDBStoreCreator(session)
+import mongoose from 'mongoose'
 
-export function setUpSessionStore(app, {SESSION_STORE_SECRET, MONGODB_URL} = {}) {
-    const store = null
-    // const store = new MongoDBStore({
-    //     uri: MONGODB_URL,
-    //     collection: 'UserSessions'
-    // }, (error) => {
-    //     // do something if it can't connect?
-    // })
-
-    app.use(session({
-        secret: SESSION_STORE_SECRET,
-        store,
-        resave: true,
-        saveUninitialized: true
-    }))
-    return store
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').load();
 }
+
+mongoose.connect(process.env.MONGODB_URI, {
+    config: {
+        autoIndex: false
+    },
+    useMongoClient: true
+});
+
+mongoose.Promise = global.Promise;
+
+const db = mongoose.connection
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+    console.log('connection open')
+});
