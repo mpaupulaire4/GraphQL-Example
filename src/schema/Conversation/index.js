@@ -1,10 +1,12 @@
+import { UserSchema } from '../User'
 import { pubsub } from '../../subscriptions'
+
 const Conversation = `
     type Conversation {
         id: ID!
         title: String!
         messages: [Message!]!
-        participants: [Participant!]!
+        participants: [ParticipantInfo!]!
     }
 `
 
@@ -50,10 +52,8 @@ const Message = `
 `
 
 const Participant = `
-    type Participant {
-        id: ID!
-        display_name: String!
-        photo_url: String!
+    type ParticipantInfo {
+        user: User!
         last_viewed: DateTime!
     }
 `
@@ -78,13 +78,14 @@ export const ConversationResolvers = {
         conversation: (_, {id}, {Convo}) => {
             return Convo.findById(id)
         },
-        conversations: (_, {search}, {Convo}) => {
+        conversations: (_, {search: {limit, offset, ...search}}, {Convo}) => {
             return Convo.find(search)
         }
     },
     Mutation: {
-        post_message: (_, {message}, {Convo}) => {
-            return Convo.post_message(message).then((message) => {
+        post_message: (_, {message: {conversation_id, ...message}}, {Convo, current_user}) => {
+            message.owner = current_user.id
+            return Convo.post_message(conversation_id, message).then((message) => {
                 pubsub.publish(`${TOPICS.CONVERSATION_NEW_MESSAGE}_${message.conversation_id}`, {id: message.id})
                 return message
             })
@@ -110,4 +111,4 @@ export const ConversationResolvers = {
     },
 }
 
-export const ConversationSchema = () => [Conversation, Participant, Queries, Mutations, Subscriptions, InputTypes, Message]
+export const ConversationSchema = () => [Conversation, Participant, Queries, Mutations, Subscriptions, InputTypes, Message, UserSchema]

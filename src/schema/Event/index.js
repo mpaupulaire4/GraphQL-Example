@@ -35,8 +35,18 @@ const Queries = `
             filter: EventSearchInput = {}
         ): [Event!]!
 
+        event(
+            # Event ID
+            id: ID!
+        ): Event
+
         events_by_location(
+            # represent the center point to look around
             location: LocationInput!
+
+            # How far out from the center point to look in meters
+            # defaults to 40000 (about 25 miles)
+            distance: Int = 40000
         ): [Event!]!
     }
 `
@@ -111,8 +121,6 @@ const EventInput = `
     }
 
     input EventSearchInput{
-        # ID has the highest priority (all others will be ignored)
-        id: ID
 
         # Will search titles containing this string
         title: String
@@ -156,29 +164,36 @@ const Location = `
 
 export const EventResolvers = {
     Query: {
-        events: (_, {filter}, {Event}) => {
-            return Event.find()
+        events: (_, {filter}, {Event, current_user}) => {
+            return Event.findWithFilter(filter, current_user)
         },
+        event: (_, {id}, {Event, current_user}) => {
+            return Event.findById(id)
+        },
+        events_by_location: (_, {location, distance},  {Event, current_user}) => {
+            return Event.findWithFilter({}, current_user).byLocation(location, distance)
+        }
     },
     Mutation: {
         create_event: async (_, {event, invites}, {current_user, Event, User, Convo}) => {
             return Event.create({...event, host: current_user.id}).then((new_event) => {
                 Convo.create({
                     title: new_event.title,
-                    id: new_event.id
+                    _id: new_event.id,
+                    participants: [{user: current_user.id}]
                 })
                 return new_event
             })
         },
         join_event: (_, {id}, {Event, Convo, current_user}) => {
             return Event.join(id, current_user.id).then((event) => {
-                Convo.join(event.id)
+                Convo.join(event.id, current_user.id)
                 return event
             })
         },
         leave_event: (_, {id}, {Event, Convo, current_user}) => {
             return Event.leave(id, current_user.id).then((event) => {
-                Convo.leave(event.id)
+                Convo.leave(event.id, current_user.id)
                 return event
             })
         },

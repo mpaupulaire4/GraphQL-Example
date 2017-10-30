@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { LocationSchema } from './Location'
+import { isArray } from 'lodash'
 const Schema = mongoose.Schema
 
 export const EventSchema = new Schema({
@@ -26,11 +27,47 @@ export const EventSchema = new Schema({
             'PRIVATE',
             'NONE'
         ],
-        default: 'PRIVATE'
+        default: 'NONE',
+        uppercase: true
     },
 })
 
 //region STATICS
+
+EventSchema.query.byLocation = function({latitude, longitude}, distance){
+    return this.find({
+        location: {
+            $nearSphere: {
+                $geometry: {
+                    type : "Point",
+                    coordinates : [ longitude, latitude ]
+                },
+                $maxDistance: distance
+            }
+        }
+    })
+}
+
+EventSchema.statics.visibilityFilter = function(user){
+    return {
+        $or: [
+            {visibility: 'PUBLIC'},
+            {host: user.id},
+            {participants: user.id},
+            {
+                visibility: 'PRIVATE',
+                $or: [
+                    {host: {$in: user.friends}},
+                    {participants: {$in: user.friends}}
+                ]
+            }
+        ]
+    }
+}
+
+EventSchema.statics.findWithFilter = function({limit, offset, ...query = {}}, user) {
+    return this.find(this.visibilityFilter(user)).find(query);
+}
 
 EventSchema.statics.join = function(event_id, user_id) {
     return this.findByIdAndUpdate(event_id,{
