@@ -13,8 +13,7 @@
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
-    "dotenv": "^4.0.0",
-    "nodemon": "^1.12.1"
+    "dotenv": "^4.0.0"
   },
   "dependencies": {
     "apollo-engine": "^0.4.6",
@@ -36,6 +35,7 @@
     "lodash": "^4.17.4",
     "moment": "^2.19.1",
     "mongoose": "^4.12.4",
+    "nodemon": "^1.12.1",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
     "path": "^0.12.7",
