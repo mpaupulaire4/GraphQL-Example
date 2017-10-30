@@ -7,9 +7,9 @@
     "node": "8.8.0"
   },
   "scripts": {
-    "start": "nodemon ./src/index.js --exec babel-node -e js",
-    "build": "babel src -d dist -s",
-    "serve": "npm run build && node ./dist/index.js",
+    "serve": "nodemon ./src/index.js --exec babel-node -e js",
+    "prestart": "babel src -d dist -s",
+    "start": "node ./dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Michel Paupulaire",
