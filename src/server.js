@@ -33,7 +33,7 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
   const app = express();
 
   if (ENGINE_API_KEY) {
-    const fullEngineConfig ={
+    const fullEngineConfig = {
       apiKey: ENGINE_API_KEY,
       logcfg: {
         level: 'DEBUG',

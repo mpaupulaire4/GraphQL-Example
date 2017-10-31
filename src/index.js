@@ -1,4 +1,4 @@
-import { run } from './src/server';
+import { run } from './server';
 
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').load();

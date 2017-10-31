@@ -2,7 +2,7 @@ import passport from 'passport'
 import PassportFacebook from 'passport-facebook'
 import { User } from '../MongoDB/Models'
 
-export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
+export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, HOST_URL } = {}) {
     if (!FACEBOOK_APP_ID || !FACEBOOK_APP_SECRET) {
         console.warn('\n\Facebook App ID or Secret not passed; login won\'t work.\n\n'); // eslint-disable-line no-console
         return null;
@@ -11,7 +11,7 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } = {}) {
     passport.use(new PassportFacebook.Strategy({
         clientID: FACEBOOK_APP_ID,
         clientSecret: FACEBOOK_APP_SECRET,
-        callbackURL: process.env.NODE_ENV !== 'production' ? 'http://localhost:3100/auth/facebook/callback' : 'http://PROD_URL/auth/facebook/callback',
+        callbackURL: process.env.NODE_ENV !== 'production' ? 'http://localhost:3100/auth/facebook/callback' : `http://${HOST_URL}/auth/facebook/callback`,
         profileFields: ['id', 'displayName', 'email', 'name', 'profileUrl', 'photos', 'friends']
     }, (accessToken, refreshToken, profile, done) => {
         const profileObj = profile._json

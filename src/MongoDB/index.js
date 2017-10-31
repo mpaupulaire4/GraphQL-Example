@@ -14,7 +14,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 mongoose.Promise = global.Promise;
 
 const db = mongoose.connection
-db.on('error', console.error.bind(console, 'connection error:'));
+db.on('error', console.error.bind(console, 'MONGODB error:'));
 db.once('open', () => {
-    console.log('connection open')
+    console.log('MONGODB: connection open')
 });

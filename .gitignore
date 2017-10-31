@@ -3,5 +3,7 @@ node_modules
 .env
 yarn.lock
 yarn-error.log
+npm-debug.log
 *.tgz
 /**/service-account.json
+dist/**
