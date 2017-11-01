@@ -23,6 +23,7 @@ const Queries = `
 
 const Mutations = `
     extend type Mutation {
+        # Post a message to a conversation
         post_message(message: MessagePost!): Message
     }
 `
@@ -53,7 +54,9 @@ const Message = `
 
 const Participant = `
     type ParticipantInfo {
+        # The user info
         user: User!
+        # A timestamp for when this user last viewed the conversation
         last_viewed: DateTime!
     }
 `
@@ -102,13 +105,13 @@ export const ConversationResolvers = {
         }
     },
     Conversation: {
-        participants: (convo, args, {User}) => {
-            return User.findByIds(Object.keys(convo.participants || {})).then((data) => data.map((user) => {
-                user.last_viewed = convo.participants[user.id]
-                return user
-            }))
-        }
+
     },
+    ParticipantInfo: {
+        user: (participant, _ , {User}) => {
+            return User.findById(participant.user)
+        }
+    }
 }
 
 export const ConversationSchema = () => [Conversation, Participant, Queries, Mutations, Subscriptions, InputTypes, Message, UserSchema]
