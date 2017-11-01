@@ -76,7 +76,7 @@ UserSchema.methods.is_me = function (user, if_true = true, if_false = null) {
 }
 
 UserSchema.methods.can_view = function (user, if_true = true, if_false =  null) {
-    if (this.is_me(user) || this.is_friend(user)){
+    if (this.is_me(user, true, false) || this.is_friend(user, true, false)){
         return if_true
     }
     return if_false
