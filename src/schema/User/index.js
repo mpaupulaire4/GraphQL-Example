@@ -76,7 +76,11 @@ export const UserResolvers = {
         name: (user, args, {current_user}) => user.can_view(current_user, user.name),
         display_name: (user, args, {current_user}) => user.can_view(current_user, user.name, user.first_name),
         email: (user, args, {current_user}) => user.can_view(current_user, user.email),
-        friends: (user, args, {current_user}) => user.is_me(current_user, user.friends, []),
+        friends: (user, args, {current_user, User}) => {
+            if (user.is_me(current_user)){
+                return User.findByIds(user.friends)
+            }
+        },
     }
 }
 
