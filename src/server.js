@@ -7,7 +7,6 @@ import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { Engine } from 'apollo-engine';
 import compression from 'compression';
 import bodyParser from 'body-parser';
-import { invert, isString } from 'lodash';
 import { createServer } from 'http';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
@@ -22,7 +21,7 @@ const WS_GQL_PATH = '/subscriptions';
 export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 3100,} = {}) {
 
   let port = portFromEnv;
-  if (isString(portFromEnv)) {
+  if (typeof portFromEnv === 'string') {
     port = parseInt(portFromEnv, 10);
   }
 

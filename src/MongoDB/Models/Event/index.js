@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 import { LocationSchema } from './Location'
-import { isArray } from 'lodash'
 const Schema = mongoose.Schema
 
 export const EventSchema = new Schema({
