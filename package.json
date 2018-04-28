@@ -4,7 +4,7 @@
   "description": "A server that implements graphql",
   "main": "./dist/index.js",
   "engines": {
-    "node": "8.8.0"
+    "node": "^8.0.0"
   },
   "scripts": {
     "serve": "nodemon ./src/index.js --exec babel-node -e js",
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "apollo-server-express": "^1.1.3",
+    "arangojs": "^6.2.4",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -29,6 +30,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
+    "connect-arango": "^0.1.3",
     "cookie": "^0.3.1",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
