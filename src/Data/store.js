@@ -7,12 +7,16 @@ export function setUpSessionStore(
     {
         SESSION_STORE_SECRET,
         ARANGODB_URI,
-        DATABASE_NAME
+        DATABASE_NAME,
+        DATABASE_USER,
+        DATABASE_PASSWORD,
     } = {}
 ) {
     const store = new Store({
         uri: ARANGODB_URI,
         db: DATABASE_NAME,
+        username: DATABASE_USER,
+        password: DATABASE_PASSWORD,
         collection: 'user_sessions',
         clear_interal: 1000 * 60 * 60,
     }, (error) => {

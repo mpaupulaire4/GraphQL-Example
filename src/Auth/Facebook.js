@@ -1,6 +1,6 @@
 import passport from 'passport'
 import PassportFacebook from 'passport-facebook'
-import { User } from '../MongoDB/Models'
+import { User } from '../Data/models'
 
 export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, HOST_URL } = {}) {
     if (!FACEBOOK_APP_ID || !FACEBOOK_APP_SECRET) {
@@ -74,7 +74,7 @@ async function FBProfileToUser({id, last_name, first_name, name, email, picture,
             link
         }
     }
-    return User.findOne({'facebook.id': id}).then((user) => {
+    return User.find({'facebook.id': id}).then((user) => {
         if (user){
             user.update(userInfo)
             return user

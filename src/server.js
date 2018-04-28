@@ -4,7 +4,7 @@ import cookie from 'cookie';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-import { Engine } from 'apollo-engine';
+// import { Engine } from 'apollo-engine';
 import compression from 'compression';
 import bodyParser from 'body-parser';
 import { createServer } from 'http';
@@ -12,7 +12,7 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
 
 import { initAuth } from './Auth'
-import { User, Event, Convo } from './MongoDB/Models'
+import { User, Event, Convo } from './Data/models'
 import schema from './schema';
 
 const WS_GQL_PATH = '/subscriptions';
