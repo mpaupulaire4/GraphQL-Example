@@ -6,6 +6,7 @@
 
 [lints]
 all=error
+untyped-import=warn
 
 [options]
 

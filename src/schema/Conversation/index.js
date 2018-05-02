@@ -114,4 +114,13 @@ export const ConversationResolvers = {
     }
 }
 
-export const ConversationSchema = () => [Conversation, Participant, Queries, Mutations, Subscriptions, InputTypes, Message, UserSchema]
+export const ConversationSchema = () => [
+    Conversation,
+    Participant,
+    Queries,
+    Mutations,
+    Subscriptions,
+    InputTypes,
+    Message,
+    UserSchema
+]
