@@ -57,7 +57,14 @@ export class Model/* :: <T: iNode> implements iModel<T> */{
     ids/* : $ReadOnlyArray<string> */,
   ) /* : Promise < Array <?T> > */{
     return this._collection.lookupByKeys(ids).then(dats => {
-      return dats.map(data => new Node(data))
+      const exist = dats.reduce((obj, data) => {
+        obj[data._id] = data
+        return obj;
+      }, {})
+
+      return ids.map((data, index) => {
+        return exist[data];
+      })
     })
   }
 

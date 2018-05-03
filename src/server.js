@@ -57,18 +57,9 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
 
   app.use('/graphql', graphqlExpress((req) => {
 
-    // Get the query, the same way express-graphql does it
-    // https://github.com/graphql/express-graphql/blob/3fa6e68582d6d933d37fa9e841da5d2aa39261cd/src/index.js#L257
-    // const query = req.query.query || req.body.query;
-    // if (query && query.length > 2000) {
-    //   // None of our app's queries are this long
-    //   // Probably indicates someone trying to send an overly expensive query
-    //   throw new Error('Query too large.');
-    // }
-
-
     // Set the id of the current signed in user in the user model for security use
-    // const UserModel = new User(req.user);
+    const UserModel = new User();
+    UserModel._prime(req.user);
     // Prime the data Loader in the user model with the current signed in user
     // UserModel._prime(req.user)
 
@@ -78,9 +69,9 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
       context: {
         // User should be set to null or properly deserialized
         current_user: req.user,
-        User: User,
-        Event: Event,
-        Convo: Convo
+        User: UserModel,
+        Event: new Event(),
+        Convo: new Convo(),
       },
     };
   }));
