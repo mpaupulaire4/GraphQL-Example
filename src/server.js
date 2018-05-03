@@ -122,9 +122,9 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
               ...params,
               context: {
                 current_user: null,
-                User: new User(null),
-                Event: new Event(null),
-                Convo: new Convo(null)
+                User: new User(),
+                Event: new Event(),
+                Convo: new Convo()
               }
             }
             if (!sessionID) {
@@ -141,17 +141,16 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
               if (session && session.passport && session.passport.user) {
                 const wsSessionUser = session.passport.user;
                 // Set the id of the current signed in user in the user model for security use
-                const UserModel = new User(wsSessionUser);
+                const UserModel = new User();
                 // Prime the data Loader in the user model with the current signed in user
-                UserModel._prime(wsSessionUser)
-
+                UserModel._prime(wsSessionUser);
                 resolve({
                   ...params,
                   context: {
                     current_user: wsSessionUser,
                     User: UserModel,
-                    Event: new Event(wsSessionUser),
-                    Convo: new Convo(wsSessionUser)
+                    Event: new Event(),
+                    Convo: new Convo()
                   },
                 });
               }

@@ -6,7 +6,18 @@ import DataLoader from 'dataloader'
 /*::
   import type { iUserModel } from '../models';
   export type UserType = {
-    id: string
+    id: string,
+    first_name: string,
+    last_name: string,
+    email: string,
+    photo_url: string,
+    facebook: FacebookInfo,
+    friends: Array<string>,
+  };
+
+  type FacebookInfo = {
+    id: string,
+    link: 'string'
   };
 */
 

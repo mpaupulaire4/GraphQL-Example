@@ -14,7 +14,9 @@
 
     create(examp: $Subtype<T>): Promise<T>,
 
-    update(examp: { id: string } & $Subtype<T>): Promise<T>
+    update(examp: { id: string } & $Subtype<T>): Promise<T>,
+
+    _prime(data: $Supertype<T>): Promise < void >,
   }
 
   export interface iUserModel<T: iNode> {
@@ -24,3 +26,5 @@
 
 
 export { default as User } from './ArangoDB/User';
+export { default as Event } from './ArangoDB/Event';
+export { default as Convo } from './ArangoDB/Convo';
