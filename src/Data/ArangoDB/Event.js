@@ -5,6 +5,7 @@ import DataLoader from 'dataloader'
 /*::
   export type EventType = {
     id: string,
+    convo_id: string,
     host: string,
     title: string,
     description: string,
