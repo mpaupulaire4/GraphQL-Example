@@ -102,9 +102,9 @@ export class Model/* :: <T: iNode> implements iModel<T> */{
   }
 
   find(
-    examp/* : $Subtype<T> */,
+    examp/* :: ?: $Subtype<T> */,
   )/* : Promise<T[]> */ {
-    if (examp.id) {
+    if (examp && examp.id) {
       return this.loader.load(examp.id).then((user) => {
         if (user) {
           return [user];
@@ -112,7 +112,7 @@ export class Model/* :: <T: iNode> implements iModel<T> */{
         return []
       });
     }
-    return this._collection.byExample(examp).then(cursor => {
+    return this._collection.byExample(examp || {}).then(cursor => {
       return cursor.all();
     }).then((data => {
       data = data.map(data => new Node(data));
