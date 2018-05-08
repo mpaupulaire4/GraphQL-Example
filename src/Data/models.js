@@ -38,3 +38,4 @@
 export { default as User } from './ArangoDB/User';
 export { default as Event } from './ArangoDB/Event';
 export { default as Convo } from './ArangoDB/Convo';
+export { default as Message } from './ArangoDB/Message';

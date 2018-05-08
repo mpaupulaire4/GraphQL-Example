@@ -12,7 +12,7 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
 
 import { initAuth } from './Auth'
-import { User, Event, Convo } from './Data/models'
+import { User, Event, Convo, Message } from './Data/models'
 import schema from './schema';
 
 const WS_GQL_PATH = '/subscriptions';
@@ -72,6 +72,7 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
         User: UserModel,
         Event: new Event(),
         Convo: new Convo(),
+        Message: new Message(),
       },
     };
   }));
@@ -124,7 +125,8 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
                 current_user: null,
                 User: new User(),
                 Event: new Event(),
-                Convo: new Convo()
+                Convo: new Convo(),
+                Message: new Message(),
               }
             }
             if (!sessionID) {
@@ -150,7 +152,8 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
                     current_user: wsSessionUser,
                     User: UserModel,
                     Event: new Event(),
-                    Convo: new Convo()
+                    Convo: new Convo(),
+                    Message: new Message(),
                   },
                 });
               }

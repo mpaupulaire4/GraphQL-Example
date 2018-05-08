@@ -71,11 +71,9 @@ extend type Subscription {
 }
 `
 
-const TOPICS = {
-  get CONVERSATION_NEW_MESSAGE(){
-    return 'CONVERSATION_NEW_MESSAGE'
-  }
-}
+const TOPICS = Object.freeze({
+  CONVERSATION_NEW_MESSAGE: 'CONVERSATION_NEW_MESSAGE'
+});
 
 export const ConversationResolvers = {
   Query: {
@@ -87,12 +85,12 @@ export const ConversationResolvers = {
     }
   },
   Mutation: {
-    post_message: (_, {message: {conversation_id, ...message}}, {Convo, current_user}) => {
+    post_message: async (_, {message}, {Message, current_user}) => {
       message.owner = current_user.id
-      return Convo.post_message(conversation_id, message).then((message) => {
-        pubsub.publish(`${TOPICS.CONVERSATION_NEW_MESSAGE}_${message.conversation_id}`, {id: message.id})
-        return message
-      })
+      message.timestamp = (new Date()).toISOString();
+      const newMessage = await Message.create(message)
+      pubsub.publish(`${TOPICS.CONVERSATION_NEW_MESSAGE}_${newMessage.conversation_id}`, {id: newMessage.id})
+      return newMessage
     }
   },
   Subscription: {
@@ -116,7 +114,7 @@ export const ConversationResolvers = {
     },
     messages: (convo, args, {Message}) => {
       return Message.find({
-        'convo_id': convo.id
+        'conversation_id': convo.id
       });
     }
   },
