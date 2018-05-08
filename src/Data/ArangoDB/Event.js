@@ -21,7 +21,8 @@ import DataLoader from 'dataloader'
     city?: string,
     state?: string,
     zip:? string,
-    coordinates: [number, number],
+    latitude: number,
+    longitude: number,
   }
 
   type ParticipantsMap = {

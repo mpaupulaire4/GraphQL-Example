@@ -27,28 +27,28 @@ const DateTypes = `
   scalar Time
 `
 const RootSchema = `
-type Query {
+  type Query {
     # Get the currently logged in user (null if none)
     current_user: User
-}
+  }
 
-type Subscription {
+  type Subscription {
     messageAdded: Temp
-}
+  }
 
-type Temp {
-  text: String
-}
+  type Temp {
+    text: String
+  }
 
-type Mutation {
+  type Mutation {
     addMessage(text: String!): [String]
-}
+  }
 
-schema {
+  schema {
     query: Query
     subscription: Subscription
     mutation: Mutation
-}
+  }
 `;
 
 
@@ -76,18 +76,18 @@ const RootResolvers = {
 // Put schema together into one array of schema strings
 // and one map of resolvers, like makeExecutableSchema expects
 const schema = [
-    RootSchema,
-    DateTypes,
-    EventSchema,
-    UserSchema,
-    ConversationSchema
+  RootSchema,
+  DateTypes,
+  EventSchema,
+  UserSchema,
+  ConversationSchema
 ];
 
 const resolvers = merge(
-    RootResolvers,
-    EventResolvers,
-    UserResolvers,
-    ConversationResolvers
+  RootResolvers,
+  EventResolvers,
+  UserResolvers,
+  ConversationResolvers
 );
 
 const executableSchema = makeExecutableSchema({
