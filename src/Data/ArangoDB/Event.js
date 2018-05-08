@@ -4,7 +4,7 @@ import { Model, Node } from './'
 import { aql } from 'arangojs'
 import DataLoader from 'dataloader'
 /*::
-  import type { iJoinable } from '../models';
+  import type { iJoinable, iEventModel } from '../models';
   export type EventType = {
     id: string,
     host: string,
@@ -32,7 +32,7 @@ import DataLoader from 'dataloader'
   type Visibility = 'PUBLIC' | 'PRIVATE' | 'NONE'
 */
 
-export default class Event extends Model/* :: <EventType> implements iJoinable <EventType>*/{
+export default class Event extends Model/* :: <EventType> implements iJoinable <EventType>, iEventModel<EventType> */{
   getCollectionName() {
     return 'events'
   }
@@ -80,5 +80,32 @@ export default class Event extends Model/* :: <EventType> implements iJoinable <
         } IN ${this._collection} OPTIONS { mergeObjects: false } RETURN NEW
       ) : RETURN doc
     `).then(({_result}) => new Node(_result[0]));
+  }
+
+  async findByLocation(
+    {
+      latitude,
+      longitude,
+    }/* : {
+      latitude: number,
+      longitude: number
+    } */,
+    radius /* : number */,
+    limit /* :: ?: number */,
+  ) /* : Promise<Array<EventType>> */ {
+    return this._db.query(aql`
+      FOR doc IN WITHIN(
+        ${this._collection},
+        ${latitude},
+        ${longitude},
+        ${radius},
+        'distance'
+      )
+        return doc
+    `).then(({_result}) => {
+      return _result.map((res) => {
+        return new Node(res);
+      })
+    });
   }
 }

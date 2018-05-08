@@ -178,7 +178,7 @@ export const EventResolvers = {
       {location, distance},
       {Event, current_user}
     ) => {
-      return Event.findWithFilter({}, current_user).byLocation(location, distance)
+      return Event.findByLocation(location, distance)
     }
   },
   Mutation: {

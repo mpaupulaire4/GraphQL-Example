@@ -23,6 +23,17 @@
     proccessUserFBFriends(user: T, fbFriendIDs: Array <string>): Promise<void>,
   }
 
+  export interface iEventModel<T: iNode> {
+    findByLocation(
+      location: {
+        latitude: number,
+        longitude: number
+      },
+      radius: number,
+      limit?: number,
+    ): Promise<Array<T>>,
+  }
+
   export interface iJoinable<T: iNode> {
     join(event_id: string, user_id: string): Promise<T>,
     leave(event_id: string, user_id: string): Promise<T>,
