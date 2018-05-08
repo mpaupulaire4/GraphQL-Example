@@ -38,7 +38,7 @@ export default class User extends Model/* :: <UserType> implements iUserModel<Us
             FILTER doc.facebook.id IN ${fbFriendIDs}
             RETURN doc._id
         )
-      } IN users
+      } IN ${this._collection}
     `)
   }
 }

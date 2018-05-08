@@ -63,7 +63,7 @@ export class Model/* :: <T: iNode> implements iModel<T> */{
       }, {})
 
       return ids.map((data, index) => {
-        return exist[data];
+        return exist[data] ? new Node(exist[data]) : null;
       })
     })
   }
@@ -134,9 +134,9 @@ export class Model/* :: <T: iNode> implements iModel<T> */{
   }
 
   update(
-    examp/* : { id: string } & $Subtype<T> */,
+    {id, ...examp}/* : { id: string } & $Subtype<T> */,
   )/* : Promise<T> */ {
-    return this._collection.update(examp.id, examp, {
+    return this._collection.update(id, examp, {
       returnNew: true,
     }).then((doc) => {
       const node = new Node(doc.new)

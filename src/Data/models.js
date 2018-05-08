@@ -22,6 +22,16 @@
   export interface iUserModel<T: iNode> {
     proccessUserFBFriends(user: T, fbFriendIDs: Array <string>): Promise<void>,
   }
+
+  export interface iJoinable<T: iNode> {
+    join(event_id: string, user_id: string): Promise<T>,
+    leave(event_id: string, user_id: string): Promise<T>,
+    kick(
+      event_id: string,
+      user_id: string,
+      participant_id: string,
+    ): Promise<T>,
+  }
 */
 
 
