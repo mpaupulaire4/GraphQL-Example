@@ -1,9 +1,10 @@
 import { EventSchema } from '../Event'
+import { NodeSchema } from '../Node'
 
 
 const User =`
   # Type for users of the app
-  type User {
+  type User implements Node {
     # the User's Unique ID
     id: ID!
 
@@ -84,4 +85,4 @@ export const UserResolvers = {
 }
 
 
-export const UserSchema = ()=> [ User, FacebookProviderInfo, Queries, Mutations, EventSchema]
+export const UserSchema = ()=> [ User, FacebookProviderInfo, Queries, Mutations, EventSchema, NodeSchema]

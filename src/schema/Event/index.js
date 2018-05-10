@@ -1,8 +1,9 @@
 import { UserSchema } from '../User'
 import { ConversationSchema } from '../Conversation'
+import { NodeSchema } from '../Node'
 
 const Event = `
-  type Event {
+  type Event implements Node {
     # Event ID
     id: ID!
 
@@ -242,5 +243,6 @@ export const EventSchema = () => [
   Mutations,
   EventInput,
   UserSchema,
-  ConversationSchema
+  ConversationSchema,
+  NodeSchema,
 ]

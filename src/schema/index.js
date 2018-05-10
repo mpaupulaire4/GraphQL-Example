@@ -12,6 +12,7 @@ import {
 import { EventSchema, EventResolvers } from './Event'
 import { UserSchema, UserResolvers } from './User'
 import { ConversationSchema, ConversationResolvers } from './Conversation'
+import { NodeResolvers, NodeSchema } from './Node'
 
 // END TYPE DEFS
 
@@ -80,14 +81,16 @@ const schema = [
   DateTypes,
   EventSchema,
   UserSchema,
-  ConversationSchema
+  ConversationSchema,
+  NodeSchema,
 ];
 
 const resolvers = merge(
   RootResolvers,
   EventResolvers,
   UserResolvers,
-  ConversationResolvers
+  ConversationResolvers,
+  NodeResolvers
 );
 
 const executableSchema = makeExecutableSchema({

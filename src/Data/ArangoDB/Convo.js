@@ -20,7 +20,7 @@ import DataLoader from 'dataloader'
   }
 */
 
-export default class Convo extends Model/* :: <ConvoType> implements iJoinable<ConvoType>*/{
+export default class Conversation extends Model/* :: <ConvoType> implements iJoinable<ConvoType>*/{
   getCollectionName() {
     return 'conversations'
   }

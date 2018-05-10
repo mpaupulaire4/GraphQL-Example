@@ -1,8 +1,9 @@
 import { UserSchema } from '../User'
 import { pubsub } from '../../subscriptions'
+import { NodeSchema } from '../Node'
 
 const Conversation = `
-  type Conversation {
+  type Conversation implements Node {
     id: ID!
     title: String!
     messages: [Message!]!
@@ -44,7 +45,7 @@ const InputTypes = `
 `
 
 const Message = `
-  type Message {
+  type Message implements Node {
     id: ID!
     text: String!
     owner: ID!
@@ -128,5 +129,6 @@ export const ConversationSchema = () => [
   Subscriptions,
   InputTypes,
   Message,
-  UserSchema
+  UserSchema,
+  NodeSchema,
 ]

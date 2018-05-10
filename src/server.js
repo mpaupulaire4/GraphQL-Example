@@ -12,7 +12,7 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
 
 import { initAuth } from './Auth'
-import { User, Event, Convo, Message } from './Data/models'
+import { User, Event, Convo, Message, Node } from './Data/models'
 import schema from './schema';
 
 const WS_GQL_PATH = '/subscriptions';
@@ -62,6 +62,9 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
     UserModel._prime(req.user);
     // Prime the data Loader in the user model with the current signed in user
     // UserModel._prime(req.user)
+    const EventModel = new Event();
+    const ConvoModel = new Convo();
+    const MessageModel = new Message();
 
     return {
       schema,
@@ -69,10 +72,16 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
       context: {
         // User should be set to null or properly deserialized
         current_user: req.user,
+        Node: new Node([
+          UserModel,
+          EventModel,
+          ConvoModel,
+          MessageModel,
+        ]),
         User: UserModel,
-        Event: new Event(),
-        Convo: new Convo(),
-        Message: new Message(),
+        Event: EventModel,
+        Convo: ConvoModel,
+        Message: MessageModel,
       },
     };
   }));
