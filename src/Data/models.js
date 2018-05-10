@@ -19,6 +19,10 @@
     _prime(data: $Supertype<T>): Promise < void >,
   }
 
+  export interface iNodeModel {
+    findById(id: string): Promise<?iNode>,
+  }
+
   export interface iUserModel<T: iNode> {
     proccessUserFBFriends(user: T, fbFriendIDs: Array <string>): Promise<void>,
   }
