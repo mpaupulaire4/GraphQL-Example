@@ -1,5 +1,6 @@
 import passport from 'passport'
 import PassportFacebook from 'passport-facebook'
+import PassportFacebookToken from 'passport-facebook-token'
 import { User } from '../Data/models'
 
 export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, HOST_URL } = {}) {
@@ -13,15 +14,12 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, HOST_URL 
 		clientSecret: FACEBOOK_APP_SECRET,
 		callbackURL: process.env.NODE_ENV !== 'production' ? 'http://localhost:3100/auth/facebook/callback' : `http://${HOST_URL}/auth/facebook/callback`,
 		profileFields: ['id', 'displayName', 'email', 'name', 'profileUrl', 'photos', 'friends']
-	}, (accessToken, refreshToken, profile, done) => {
-		const profileObj = profile._json
-		FBProfileToUser(profileObj).then((user) => {
-			done(null, user)
-		}).catch((error) => {
-			console.log(error)
-			done(null, false, error)
-		})
-	}))
+	}, facebookUserCallback))
+
+	passport.use(new PassportFacebookToken({
+    clientID: FACEBOOK_APP_ID,
+    clientSecret: FACEBOOK_APP_SECRET
+  }, facebookUserCallback));
 
 	passport.serializeUser((user, done) => {
 		done(null, user.id);
@@ -37,6 +35,7 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, HOST_URL 
 
 	app.use(passport.initialize());
 	app.use(passport.session());
+	app.use(/!(\/auth\/.*)/, passport.authenticate('facebook-token'))
 
 	// Redirect the user to Facebook for authentication.  When complete,
 	// Facebook will redirect the user back to the application at
@@ -56,6 +55,16 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, HOST_URL 
 		req.logout();
 		res.redirect('/');
 	});
+}
+
+function facebookUserCallback(accessToken, refreshToken, profile, done) {
+	const profileObj = profile._json
+	FBProfileToUser(profileObj).then((user) => {
+		done(null, user)
+	}).catch((error) => {
+		console.log(error)
+		done(null, false, error)
+	})
 }
 
 
