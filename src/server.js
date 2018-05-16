@@ -57,11 +57,10 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
 
   app.use('/graphql', graphqlExpress((req) => {
 
-    // Set the id of the current signed in user in the user model for security use
-    const UserModel = new User();
-    UserModel._prime(req.user);
     // Prime the data Loader in the user model with the current signed in user
     // UserModel._prime(req.user)
+    const UserModel = new User();
+    UserModel._prime(req.user);
     const EventModel = new Event();
     const ConvoModel = new Convo();
     const MessageModel = new Message();
