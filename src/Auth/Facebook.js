@@ -18,7 +18,8 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, HOST_URL 
 
 	passport.use(new PassportFacebookToken({
     clientID: FACEBOOK_APP_ID,
-    clientSecret: FACEBOOK_APP_SECRET
+		clientSecret: FACEBOOK_APP_SECRET,
+		profileFields: ['id', 'displayName', 'email', 'name', 'profileUrl', 'photos', 'friends']
   }, facebookUserCallback));
 
 	passport.serializeUser((user, done) => {
@@ -35,7 +36,12 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, HOST_URL 
 
 	app.use(passport.initialize());
 	app.use(passport.session());
-	app.use(/!(\/auth\/.*)/, passport.authenticate('facebook-token'))
+	app.use('/graphql', (req, res, next) => {
+		if (!req.user) {
+			return passport.authenticate('facebook-token')(req, res, next)
+		}
+		return next()
+	})
 
 	// Redirect the user to Facebook for authentication.  When complete,
 	// Facebook will redirect the user back to the application at

@@ -1,5 +1,6 @@
 import { merge } from 'lodash';
 import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools';
+import {printSchema} from 'graphql';
 
 // DATE TYPES
 import {
@@ -100,5 +101,7 @@ const executableSchema = makeExecutableSchema({
 
 // FOR TESTING SCHEMA
 // addMockFunctionsToSchema({schema: executableSchema})
-
+// console.log(printSchema(executableSchema, {
+//   commentDescriptions: true
+// }))
 export default executableSchema;

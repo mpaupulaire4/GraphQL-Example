@@ -56,7 +56,6 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
   app.use(cookieParser(SESSION_STORE_SECRET));
 
   app.use('/graphql', graphqlExpress((req) => {
-
     // Prime the data Loader in the user model with the current signed in user
     // UserModel._prime(req.user)
     const UserModel = new User();
