@@ -125,6 +125,8 @@ const EventInput = `
   }
 
   input EventSearchInput{
+    # ID of the event host
+    host: ID
 
     # Will search titles containing this string
     title: String
@@ -137,10 +139,10 @@ const EventInput = `
     time: [DateTime!]
 
     # For pagination - where to begin search
-    offset: Int = 0
+    # offset: Int = 0
 
     # For pagination - page size
-    limit: Int = 1000
+    # limit: Int = 1000
   }
 
   # LatLng's take precedence
@@ -169,7 +171,7 @@ const Location = `
 export const EventResolvers = {
   Query: {
     events: (_, {filter}, {Event, current_user}) => {
-      return Event.find(filter, current_user)
+      return Event.find(filter)
     },
     event: (_, {id}, {Event, current_user}) => {
       return Event.findById(id)
