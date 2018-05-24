@@ -30,6 +30,10 @@ const Event = `
 
     # The event's visibility
     visibility: Visibility!
+
+    # The Events distance from the user.
+    # Will only be defined on queries by location
+    distance: Float
   }
 `
 const Queries = `
@@ -47,6 +51,9 @@ const Queries = `
     events_by_location(
       # represent the center point to look around
       location: LocationInput!
+
+      # Visibility filter
+      view: VIEW = PUBLIC
 
       # How far out from the center point to look in meters
       # defaults to 40000 (about 25 miles)
@@ -136,7 +143,10 @@ const EventInput = `
 
     # Will search in between these 2 times.
     # Will only use first 2 positions
-    time: [DateTime!]
+    # time: [DateTime!]
+
+    # Searches for Events where all the listed users are participating
+    participants: [ID!]
 
     # For pagination - where to begin search
     # offset: Int = 0
@@ -153,6 +163,17 @@ const EventInput = `
     city: String
     state: String
     zip: String
+  }
+
+  enum VIEW {
+    # All public events
+    PUBLIC
+
+    # All events hosted by your friends
+    FRIENDS
+
+    # All events you've been invited to
+    INVITES
   }
 `
 const Location = `
@@ -178,10 +199,22 @@ export const EventResolvers = {
     },
     events_by_location: (
       _,
-      {location, distance},
+      {location, distance, view},
       {Event, current_user}
     ) => {
-      return Event.findByLocation(location, distance)
+      return Event.findByLocation(location, distance).then((events) => {
+        return events.filter((event) => {
+          switch (view) {
+            case 'INVITES':
+              return !!event.invites[current_user.id]
+            case 'FRIENDS':
+              return friendsViewFilter(event, current_user.friends)
+            case 'PUBLIC':
+            default:
+              return event.visibility === 'PUBLIC'
+          }
+        })
+      })
     }
   },
   Mutation: {
@@ -199,6 +232,10 @@ export const EventResolvers = {
         host: current_user.id,
         participants: {},
         convo_id: convo.id,
+        invites: invites.reduce((obj, id) => ({
+          ...obj,
+          [id]: current_user.id
+        }), {})
       });
       return new_event
     },
@@ -236,6 +273,21 @@ export const EventResolvers = {
   }
 }
 
+function friendsViewFilter(event = {}, friends= []) {
+  for (let id of friends) {
+    if (
+      event.visibility !== 'NONE' &&
+      event.host === id
+    )
+      return true
+    if (
+      event.visibility === 'PUBLIC' &&
+      event.participants[id]
+    )
+      return true
+  }
+  return false
+}
 
 export const EventSchema = () => [
   Event,

@@ -14,6 +14,7 @@ import DataLoader from 'dataloader'
     location: Location,
     participants: ParticipantsMap,
     visibility: Visibility,
+    invites: InviteMap,
   };
 
   type Location = {
@@ -26,7 +27,11 @@ import DataLoader from 'dataloader'
   }
 
   type ParticipantsMap = {
-    [user_id: string]: string,
+    [user_id: string]: boolean,
+  }
+
+  type InviteMap = {
+    [invitee_id: string]: string // inviter_id
   }
 
   type Visibility = 'PUBLIC' | 'PRIVATE' | 'NONE'
@@ -37,6 +42,23 @@ export default class Event extends Model/* :: <EventType> implements iJoinable <
     return 'events'
   }
 
+  async find(
+    examp/* :: ?: $Subtype<EventType> */,
+  )/* : Promise<EventType[]> */  {
+    let newExamp = examp
+    if (examp && examp.participants) {
+      newExamp = {
+        ...examp,
+        ...examp.participants.reduce((obj, id) => {
+          obj[`participants.${id}`] = true
+          return obj
+        }, {})
+      }
+      delete newExamp['participants']
+    }
+    return super.find(newExamp)
+  }
+
   async join(
     event_id /* : string */,
     user_id/* : string */,
@@ -44,7 +66,7 @@ export default class Event extends Model/* :: <EventType> implements iJoinable <
     return this._db.query(aql`
       LET doc = DOCUMENT(${event_id})
       UPDATE doc WITH {
-        participants: { ${user_id}: DATE_ISO8601( DATE_NOW() ) }
+        participants: { ${user_id}: true }
       } IN ${this._collection} RETURN NEW
     `).then(({_result}) => new Node(_result[0]));
   }
