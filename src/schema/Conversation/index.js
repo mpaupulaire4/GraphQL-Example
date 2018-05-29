@@ -58,6 +58,9 @@ const Participant = `
     # The user id
     id: ID!
 
+    # The participants display name
+    display_name: String!
+
     # A timestamp for when this user last viewed the conversation
     last_viewed: DateTime!
   }
@@ -105,7 +108,7 @@ export const ConversationResolvers = {
     }
   },
   Conversation: {
-    participants: (convo) => {
+    participants: (convo, _, {User}) => {
       return Object.keys(convo.participants).map((key) => {
         return {
           id: key,
@@ -119,6 +122,13 @@ export const ConversationResolvers = {
       });
     }
   },
+  ParticipantInfo: {
+    display_name: (info, _, {User}) => {
+      return User.findById(info.id).then((user) => {
+        return user.name
+      })
+    }
+  }
 }
 
 export const ConversationSchema = () => [
