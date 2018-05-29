@@ -39,7 +39,7 @@ const InputTypes = `
   }
 
   input MessagePost {
-    conversation_id: ID!
+    convo_id: ID!
     text: String!
   }
 `
@@ -90,7 +90,7 @@ export const ConversationResolvers = {
       message.owner = current_user.id
       message.timestamp = (new Date()).toISOString();
       const newMessage = await Message.create(message)
-      pubsub.publish(`${TOPICS.CONVERSATION_NEW_MESSAGE}_${newMessage.conversation_id}`, {id: newMessage.id})
+      pubsub.publish(`${TOPICS.CONVERSATION_NEW_MESSAGE}_${newMessage.convo_id}`, {id: newMessage.id})
       return newMessage
     }
   },
@@ -115,7 +115,7 @@ export const ConversationResolvers = {
     },
     messages: (convo, args, {Message}) => {
       return Message.find({
-        'conversation_id': convo.id
+        'convo_id': convo.id
       });
     }
   },

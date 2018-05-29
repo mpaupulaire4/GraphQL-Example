@@ -13,7 +13,7 @@ import { execute, subscribe } from 'graphql';
 
 import { initAuth } from './Auth'
 import { User, Event, Convo, Message, Node } from './Data/models'
-import schema from './schema';
+import schema, { FullSchemaDeff } from './schema';
 
 const WS_GQL_PATH = '/subscriptions';
 
@@ -54,6 +54,10 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
 
   const sessionStore = initAuth(app);
   app.use(cookieParser(SESSION_STORE_SECRET));
+
+  app.get('/schema', (req, res) => {
+    res.send(FullSchemaDeff)
+  })
 
   app.use('/graphql', graphqlExpress((req) => {
     // Prime the data Loader in the user model with the current signed in user

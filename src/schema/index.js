@@ -101,7 +101,8 @@ const executableSchema = makeExecutableSchema({
 
 // FOR TESTING SCHEMA
 // addMockFunctionsToSchema({schema: executableSchema})
-// console.log(printSchema(executableSchema, {
-//   commentDescriptions: true
-// }))
+export const FullSchemaDeff = printSchema(executableSchema, {
+  commentDescriptions: true
+})
+
 export default executableSchema;

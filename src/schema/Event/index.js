@@ -221,12 +221,8 @@ export const EventResolvers = {
     create_event: async (_, {event, invites}, {current_user, Event, Convo}) => {
       const convo = await Convo.create({
         title: event.title,
-        participants: {
-          [current_user.id]: {
-            last_viewed: (new Date()).toISOString()
-          },
-        },
       })
+      Convo.join(convo.id, current_user.id)
       const new_event = await Event.create({
         ...event,
         host: current_user.id,
