@@ -6,4 +6,4 @@ yarn-error.log
 npm-debug.log
 *.tgz
 /**/service-account.json
-dist/**
+dist
