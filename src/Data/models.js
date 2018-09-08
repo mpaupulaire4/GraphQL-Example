@@ -1,5 +1,4 @@
 // @flow
-
 /* ::
   export interface iNode {
     id: string

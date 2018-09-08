@@ -26,4 +26,7 @@ export const NodeResolvers = {
   },
 }
 
-export const NodeSchema = () => [Node, Queries]
+export const NodeSchema = () => [
+  Node,
+  Queries
+]

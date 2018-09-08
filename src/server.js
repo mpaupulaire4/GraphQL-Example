@@ -1,10 +1,8 @@
-import path from 'path';
 import express from 'express';
 import cookie from 'cookie';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-// import { Engine } from 'apollo-engine';
 import compression from 'compression';
 import bodyParser from 'body-parser';
 import { createServer } from 'http';
@@ -31,21 +29,6 @@ export function run({ SESSION_STORE_SECRET, ENGINE_API_KEY, PORT: portFromEnv = 
 
   const app = express();
 
-  // if (ENGINE_API_KEY) {
-  //   const fullEngineConfig = {
-  //     apiKey: ENGINE_API_KEY,
-  //     logcfg: {
-  //       level: 'DEBUG',
-  //     },
-  //   };
-  //   const engine = new Engine({
-  //     engineConfig: fullEngineConfig,
-  //     endpoint: '/graphql',
-  //     graphqlPort: port,
-  //   });
-  //   // engine.start();
-  //   // app.use(engine.expressMiddleware());
-  // }
   app.use(compression());
 
   app.use(cors());

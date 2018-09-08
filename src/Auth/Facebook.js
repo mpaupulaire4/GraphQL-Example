@@ -25,6 +25,7 @@ export function setUpAuth(app, { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET, HOST_URL 
 	passport.serializeUser((user, done) => {
 		done(null, user.id);
 	});
+
 	passport.deserializeUser((id, done) => {
 		(new User()).findById(id).then((user) => {
 			done(null, user);
